@@ -1,0 +1,134 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "SharkPay user account profile and wallet balances",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string", "maxLength": 128 },
+        "email": { "type": "string", "maxLength": 256 },
+        "phone": { "type": "string", "maxLength": 32 },
+        "balance": { "type": "number" },
+        "quota": { "type": "number" },
+        "topUpBonus": { "type": "number" },
+        "teamCommission": { "type": "number" },
+        "todayReceived": { "type": "number" },
+        "todayRecharge": { "type": "number" },
+        "totalRecharge": { "type": "number" },
+        "usdtRatio": { "type": "number" },
+        "inviteCode": { "type": "string", "maxLength": 64 },
+        "inviteUrl": { "type": "string", "maxLength": 256 },
+        "securityPin": { "type": "string", "maxLength": 16 },
+        "language": { "type": "string", "maxLength": 32 },
+        "is2FAEnabled": { "type": "boolean" },
+        "twoFactorSecret": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "maxLength": 64 },
+        "updatedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["userId", "phone", "balance", "quota"]
+    },
+    "UPIAccount": {
+      "title": "UPIAccount",
+      "description": "Linked UPI payment account for receiving and sending payouts",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "appName": { "type": "string", "maxLength": 64 },
+        "upiId": { "type": "string", "maxLength": 128 },
+        "title": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "enum": ["receive", "send", "both"] },
+        "isOnSale": { "type": "boolean" },
+        "pin": { "type": "string", "maxLength": 16 },
+        "createdAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "appName", "upiId", "type", "isOnSale"]
+    },
+    "RechargeRecord": {
+      "title": "RechargeRecord",
+      "description": "Log of recharge, USDT deposit, or quota purchases",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "maxLength": 32 },
+        "amount": { "type": "number" },
+        "amountUnit": { "type": "string", "maxLength": 16 },
+        "inrValue": { "type": "number" },
+        "status": { "type": "string", "enum": ["success", "pending", "failed"] },
+        "upiRef": { "type": "string", "maxLength": 128 },
+        "txHash": { "type": "string", "maxLength": 256 },
+        "date": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "type", "amount", "status", "date"]
+    },
+    "TokenRecord": {
+      "title": "TokenRecord",
+      "description": "Token and reward transaction ledger entry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "type": { "type": "string", "maxLength": 64 },
+        "title": { "type": "string", "maxLength": 128 },
+        "amount": { "type": "number" },
+        "isPositive": { "type": "boolean" },
+        "date": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "type", "title", "amount", "isPositive", "date"]
+    },
+    "TeamMember": {
+      "title": "TeamMember",
+      "description": "Referred team member with commission stats",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "userId": { "type": "string", "maxLength": 128 },
+        "name": { "type": "string", "maxLength": 128 },
+        "phone": { "type": "string", "maxLength": 32 },
+        "tier": { "type": "number" },
+        "tradingVolume": { "type": "number" },
+        "commissionEarned": { "type": "number" },
+        "joinedAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["id", "userId", "name", "phone", "tier", "tradingVolume", "commissionEarned", "joinedAt"]
+    },
+    "Account": {
+      "title": "Account",
+      "description": "Registered Phone ID credentials",
+      "type": "object",
+      "properties": {
+        "phone": { "type": "string", "maxLength": 32 },
+        "password": { "type": "string", "maxLength": 128 },
+        "registeredAt": { "type": "string", "maxLength": 64 }
+      },
+      "required": ["phone", "password"]
+    }
+  },
+  "firestore": {
+    "/accounts/{phone}": {
+      "schema": "Account",
+      "description": "Registered user ID and password records"
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profile with balance and wallet security preferences"
+    },
+    "/users/{userId}/upiAccounts/{accountId}": {
+      "schema": "UPIAccount",
+      "description": "Bound UPI payment accounts for user"
+    },
+    "/users/{userId}/recharges/{rechargeId}": {
+      "schema": "RechargeRecord",
+      "description": "Top-up and quota deposit ledger"
+    },
+    "/users/{userId}/tokens/{tokenId}": {
+      "schema": "TokenRecord",
+      "description": "Reward, bonus, and quota tokens history"
+    },
+    "/users/{userId}/teamMembers/{memberId}": {
+      "schema": "TeamMember",
+      "description": "Direct and tier teammates"
+    }
+  }
+}

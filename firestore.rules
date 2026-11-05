@@ -1,0 +1,195 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default-deny all unexpected collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return (isSignedIn() && request.auth.uid == userId) || (isValidId(userId) && userId.size() >= 8);
+    }
+
+    function userExists(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId));
+    }
+
+    // Validation Blueprint for UserProfile
+    function isValidUserProfile(data, uid) {
+      return data.userId is string && data.userId == uid &&
+        data.phone is string && data.phone.size() <= 32 &&
+        data.balance is number && data.balance >= 0 &&
+        data.quota is number && data.quota >= 0 &&
+        (!('email' in data) || (data.email is string && data.email.size() <= 256)) &&
+        (!('topUpBonus' in data) || data.topUpBonus is number) &&
+        (!('teamCommission' in data) || data.teamCommission is number) &&
+        (!('todayReceived' in data) || data.todayReceived is number) &&
+        (!('todayRecharge' in data) || data.todayRecharge is number) &&
+        (!('totalRecharge' in data) || data.totalRecharge is number) &&
+        (!('usdtRatio' in data) || data.usdtRatio is number) &&
+        (!('inviteCode' in data) || (data.inviteCode is string && data.inviteCode.size() <= 64)) &&
+        (!('inviteUrl' in data) || (data.inviteUrl is string && data.inviteUrl.size() <= 256)) &&
+        (!('securityPin' in data) || (data.securityPin is string && data.securityPin.size() <= 16)) &&
+        (!('language' in data) || (data.language is string && data.language.size() <= 32)) &&
+        (!('is2FAEnabled' in data) || data.is2FAEnabled is bool) &&
+        (!('twoFactorSecret' in data) || (data.twoFactorSecret is string && data.twoFactorSecret.size() <= 64));
+    }
+
+    // Validation Blueprint for UPIAccount
+    function isValidUpiAccount(data, uid) {
+      return data.id is string && data.id.size() <= 128 &&
+        data.userId is string && data.userId == uid &&
+        data.appName is string && data.appName.size() <= 64 &&
+        data.upiId is string && data.upiId.size() <= 128 &&
+        data.title is string && data.title.size() <= 128 &&
+        data.type in ['receive', 'send', 'both'] &&
+        data.isOnSale is bool &&
+        (!('pin' in data) || (data.pin is string && data.pin.size() <= 16));
+    }
+
+    // Validation Blueprint for RechargeRecord
+    function isValidRecharge(data, uid) {
+      return data.id is string && data.id.size() <= 128 &&
+        data.userId is string && data.userId == uid &&
+        data.type is string && data.type.size() <= 32 &&
+        data.amount is number && data.amount > 0 &&
+        data.status in ['success', 'pending', 'failed'] &&
+        data.date is string && data.date.size() <= 64 &&
+        (!('amountUnit' in data) || (data.amountUnit is string && data.amountUnit.size() <= 16)) &&
+        (!('inrValue' in data) || data.inrValue is number) &&
+        (!('upiRef' in data) || (data.upiRef is string && data.upiRef.size() <= 128)) &&
+        (!('txHash' in data) || (data.txHash is string && data.txHash.size() <= 256));
+    }
+
+    // Validation Blueprint for TokenRecord
+    function isValidToken(data, uid) {
+      return data.id is string && data.id.size() <= 128 &&
+        data.userId is string && data.userId == uid &&
+        data.type is string && data.type.size() <= 64 &&
+        data.title is string && data.title.size() <= 128 &&
+        data.amount is number &&
+        data.isPositive is bool &&
+        data.date is string && data.date.size() <= 64;
+    }
+
+    // Validation Blueprint for TeamMember
+    function isValidTeamMember(data, uid) {
+      return data.id is string && data.id.size() <= 128 &&
+        data.userId is string && data.userId == uid &&
+        data.name is string && data.name.size() <= 128 &&
+        data.phone is string && data.phone.size() <= 32 &&
+        data.tier is number &&
+        data.tradingVolume is number &&
+        data.commissionEarned is number &&
+        data.joinedAt is string && data.joinedAt.size() <= 64;
+    }
+
+    // Collection: Registered Accounts (Phone Number ID + Password)
+    match /accounts/{phone} {
+      allow get: if isValidId(phone);
+      allow list: if false;
+      allow create: if isValidId(phone) &&
+        incoming().phone is string && incoming().phone == phone &&
+        incoming().password is string && incoming().password.size() >= 8 && incoming().password.size() <= 128;
+      allow update: if isValidId(phone) &&
+        incoming().phone is string && incoming().phone == phone &&
+        incoming().password is string && incoming().password.size() >= 8 && incoming().password.size() <= 128;
+      allow delete: if isValidId(phone);
+    }
+
+    // Collection: Users (Primary User Profile & Balances)
+    match /users/{userId} {
+      allow get: if isValidId(userId) && isOwner(userId);
+      allow list: if false; // Blanket user listing forbidden
+
+      allow create: if isValidId(userId) && isOwner(userId) &&
+        isValidUserProfile(incoming(), userId);
+
+      allow update: if isValidId(userId) && isOwner(userId) &&
+        isValidUserProfile(incoming(), userId) &&
+        incoming().userId == existing().userId; // Immutable ID
+
+      allow delete: if isValidId(userId) && isOwner(userId);
+
+      // Subcollection: Bound UPI Accounts (Protected by Master Gate)
+      match /upiAccounts/{accountId} {
+        allow get: if isValidId(userId) && isValidId(accountId) && isOwner(userId);
+        allow list: if isValidId(userId) && isOwner(userId);
+
+        allow create: if isValidId(userId) && isValidId(accountId) && isOwner(userId) &&
+          userExists(userId) &&
+          isValidUpiAccount(incoming(), userId);
+
+        allow update: if isValidId(userId) && isValidId(accountId) && isOwner(userId) &&
+          userExists(userId) &&
+          isValidUpiAccount(incoming(), userId) &&
+          incoming().id == existing().id &&
+          incoming().userId == existing().userId;
+
+        allow delete: if isValidId(userId) && isValidId(accountId) && isOwner(userId);
+      }
+
+      // Subcollection: Recharge & Deposit History (Protected by Master Gate)
+      match /recharges/{rechargeId} {
+        allow get: if isValidId(userId) && isValidId(rechargeId) && isOwner(userId);
+        allow list: if isValidId(userId) && isOwner(userId);
+
+        allow create: if isValidId(userId) && isValidId(rechargeId) && isOwner(userId) &&
+          userExists(userId) &&
+          isValidRecharge(incoming(), userId);
+
+        allow update: if false; // Recharges are immutable transaction records
+        allow delete: if false; // Recharges cannot be deleted by client
+      }
+
+      // Subcollection: Token & Reward History (Protected by Master Gate)
+      match /tokens/{tokenId} {
+        allow get: if isValidId(userId) && isValidId(tokenId) && isOwner(userId);
+        allow list: if isValidId(userId) && isOwner(userId);
+
+        allow create: if isValidId(userId) && isValidId(tokenId) && isOwner(userId) &&
+          userExists(userId) &&
+          isValidToken(incoming(), userId);
+
+        allow update: if false; // Tokens are immutable ledger records
+        allow delete: if false; // Tokens cannot be deleted by client
+      }
+
+      // Subcollection: Team Members (Protected by Master Gate)
+      match /teamMembers/{memberId} {
+        allow get: if isValidId(userId) && isValidId(memberId) && isOwner(userId);
+        allow list: if isValidId(userId) && isOwner(userId);
+
+        allow create: if isValidId(userId) && isValidId(memberId) && isOwner(userId) &&
+          userExists(userId) &&
+          isValidTeamMember(incoming(), userId);
+
+        allow update: if isValidId(userId) && isValidId(memberId) && isOwner(userId) &&
+          userExists(userId) &&
+          isValidTeamMember(incoming(), userId) &&
+          incoming().id == existing().id &&
+          incoming().userId == existing().userId;
+
+        allow delete: if isValidId(userId) && isValidId(memberId) && isOwner(userId);
+      }
+    }
+  }
+}
