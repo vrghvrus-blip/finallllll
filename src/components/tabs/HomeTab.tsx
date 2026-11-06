@@ -1,10 +1,14 @@
 import React from 'react';
 import { ChevronRight } from 'lucide-react';
-import { UserProfile } from '../../types/rswallet';
+import { UserProfile, TokenRecord, RechargeRecord, TeamMember } from '../../types/rswallet';
 import { FreeChargeLogoTile, IndusIndLogoTile, PhonePeMultiLogoTile } from '../PaymentLogos';
+import { HomeAnalytics } from '../analytics/HomeAnalytics';
 
 interface HomeTabProps {
   user: UserProfile;
+  tokenRecords?: TokenRecord[];
+  rechargeRecords?: RechargeRecord[];
+  teamMembers?: TeamMember[];
   onOpenTopUp: () => void;
   onOpenNewbieGuide: () => void;
   onOpenNewbieReward: () => void;
@@ -15,6 +19,9 @@ interface HomeTabProps {
 
 export const HomeTab: React.FC<HomeTabProps> = ({
   user,
+  tokenRecords,
+  rechargeRecords,
+  teamMembers,
   onOpenTopUp,
   onOpenNewbieGuide,
   onOpenNewbieReward,
@@ -227,6 +234,16 @@ export const HomeTab: React.FC<HomeTabProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Analytics & 7-Day Performance Visualization Section */}
+      <HomeAnalytics
+        user={user}
+        tokenRecords={tokenRecords}
+        rechargeRecords={rechargeRecords}
+        teamMembers={teamMembers}
+        onOpenHistory={onOpenHistory}
+        onNavigateTeam={() => onNavigateTab('team')}
+      />
 
       {/* Tutorial Section */}
       <div className="bg-white rounded-2xl border border-zinc-100 shadow-sm p-4 space-y-4">

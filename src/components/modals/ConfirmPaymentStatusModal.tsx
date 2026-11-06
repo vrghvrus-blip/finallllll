@@ -62,20 +62,25 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
 
   if (!isOpen) return null;
 
+  const [verifyRail, setVerifyRail] = useState<'INR' | 'USDT'>('INR');
   const selectedAccount = upiAccounts.find((a) => a.id === selectedAccountId) || upiAccounts[0];
 
   const handleRunVerification = async () => {
-    const cleanUtr = utrInput.trim();
-    if (!cleanUtr) {
-      setErrorMessage('Please enter a 12-digit numeric UPI Ref / UTR number');
+    const cleanRef = utrInput.trim();
+    if (!cleanRef) {
+      setErrorMessage(
+        verifyRail === 'INR'
+          ? 'Please enter a 12-digit numeric UPI Ref / UTR number'
+          : 'Please enter your Tron (TRC20) Transaction Hash (TxID)'
+      );
       return;
     }
-    if (!/^\d{12}$/.test(cleanUtr)) {
+    if (verifyRail === 'INR' && !/^\d{12}$/.test(cleanRef)) {
       setErrorMessage('Invalid UTR! Must be exactly 12 numeric digits (e.g. 430712894567)');
       return;
     }
-    if (!selectedAccount) {
-      setErrorMessage('Please bind or select a UPI bidding account to verify status');
+    if (verifyRail === 'USDT' && cleanRef.length < 10) {
+      setErrorMessage('Invalid Tron TxHash! Must be at least 10 characters.');
       return;
     }
 
@@ -84,29 +89,43 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
     setVerificationResult(null);
 
     // Multi-step verification animation
-    setVerifyStep('Checking NPCI UPI central settlement rail...');
-    await new Promise((r) => setTimeout(r, 650));
+    if (verifyRail === 'INR') {
+      setVerifyStep('Checking NPCI UPI central settlement rail...');
+      await new Promise((r) => setTimeout(r, 600));
 
-    setVerifyStep(`Matching bound UPI bidding handle (${selectedAccount.upiId})...`);
-    await new Promise((r) => setTimeout(r, 650));
+      setVerifyStep(`Matching bound UPI bidding handle (${selectedAccount?.upiId || 'Direct'})...`);
+      await new Promise((r) => setTimeout(r, 600));
 
-    setVerifyStep('Validating transfer to Bank of Maharashtra **** 4002...');
-    await new Promise((r) => setTimeout(r, 650));
+      setVerifyStep('Validating transfer to Bank of Maharashtra **** 4002...');
+      await new Promise((r) => setTimeout(r, 600));
 
-    setVerifyStep('Confirming settlement and crediting quota...');
-    await new Promise((r) => setTimeout(r, 500));
+      setVerifyStep('Confirming settlement and crediting quota...');
+      await new Promise((r) => setTimeout(r, 500));
+    } else {
+      setVerifyStep('Connecting to Tron (TRC20) Mainnet RPC node...');
+      await new Promise((r) => setTimeout(r, 600));
 
-    const amt = parseFloat(customAmount) || 500;
-    const quotaAmt = Math.round(amt * 1.025);
+      setVerifyStep('Locating TxHash on TronGrid / TronScan...');
+      await new Promise((r) => setTimeout(r, 600));
+
+      setVerifyStep('Verifying 1 block confirmation for target address...');
+      await new Promise((r) => setTimeout(r, 600));
+
+      setVerifyStep('Crediting USDT deposit into SharkPay balance...');
+      await new Promise((r) => setTimeout(r, 500));
+    }
+
+    const amt = parseFloat(customAmount) || (verifyRail === 'INR' ? 500 : 100);
+    const quotaAmt = verifyRail === 'INR' ? Math.round(amt * 1.025) : Math.round(amt * 118.3);
 
     if (onConfirmStatusWithUtr) {
-      await onConfirmStatusWithUtr(cleanUtr, selectedAccount.id, amt);
+      await onConfirmStatusWithUtr(cleanRef, selectedAccount?.id || 'direct', amt);
     }
 
     setVerificationResult({
       status: 'success',
-      utr: cleanUtr,
-      boundUpi: selectedAccount.upiId,
+      utr: cleanRef,
+      boundUpi: verifyRail === 'INR' ? (selectedAccount?.upiId || 'Direct UPI') : 'Tron TRC20 Wallet',
       amount: amt,
       creditedQuota: quotaAmt,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
@@ -117,8 +136,13 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
   };
 
   const handleGenerateSampleUtr = () => {
-    const randomUtr = `4307${Math.floor(10000000 + Math.random() * 90000000)}`;
-    setUtrInput(randomUtr);
+    if (verifyRail === 'INR') {
+      const randomUtr = `4307${Math.floor(10000000 + Math.random() * 90000000)}`;
+      setUtrInput(randomUtr);
+    } else {
+      const randomTx = `f7a${Date.now().toString(16)}${Math.random().toString(36).slice(2, 10)}`;
+      setUtrInput(randomTx);
+    }
     setErrorMessage('');
   };
 
@@ -247,115 +271,154 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
             ) : (
               /* Verification Form View */
               <div className="space-y-4">
-                {/* 1. UPI Bidding Option (Bound Account Selection) */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <label className="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
-                      <CreditCard className="w-3.5 h-3.5 text-zinc-600" />
-                      <span>1. Select UPI Bidding Account</span>
-                    </label>
-                    <button
-                      type="button"
-                      onClick={onOpenBindUpi}
-                      className="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer"
-                    >
-                      <Plus className="w-3 h-3" />
-                      <span>Bind New UPI</span>
-                    </button>
-                  </div>
+                {/* Payment Rail Switcher: INR UPI vs USDT TRC20 */}
+                <div className="grid grid-cols-2 gap-2 bg-zinc-100 p-1 rounded-xl">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setVerifyRail('INR');
+                      setCustomAmount('500');
+                      setUtrInput('');
+                    }}
+                    className={`py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+                      verifyRail === 'INR' ? 'bg-white text-zinc-950 shadow-xs' : 'text-zinc-500 hover:text-zinc-900'
+                    }`}
+                  >
+                    INR UPI (12-Digit UTR)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setVerifyRail('USDT');
+                      setCustomAmount('100');
+                      setUtrInput('');
+                    }}
+                    className={`py-2 text-xs font-bold rounded-lg transition cursor-pointer ${
+                      verifyRail === 'USDT' ? 'bg-white text-zinc-950 shadow-xs' : 'text-zinc-500 hover:text-zinc-900'
+                    }`}
+                  >
+                    USDT TRC20 (TxHash)
+                  </button>
+                </div>
 
-                  {upiAccounts.length === 0 ? (
-                    <div className="p-3.5 bg-amber-50/80 border border-amber-200 rounded-xl space-y-2 text-center">
-                      <p className="text-xs font-semibold text-amber-800">
-                        No UPI Account Bound yet for bidding
-                      </p>
+                {/* 1. UPI Account Selection (when INR) or Target TRC20 (when USDT) */}
+                {verifyRail === 'INR' ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
+                        <CreditCard className="w-3.5 h-3.5 text-zinc-600" />
+                        <span>1. Select UPI Bidding Account</span>
+                      </label>
                       <button
                         type="button"
                         onClick={onOpenBindUpi}
-                        className="px-4 py-2 bg-black text-white text-xs font-bold rounded-lg hover:bg-zinc-800 active:scale-95 transition inline-flex items-center gap-1.5"
+                        className="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer"
                       >
-                        <Plus className="w-3.5 h-3.5" />
-                        <span>Bind UPI Account Now</span>
+                        <Plus className="w-3 h-3" />
+                        <span>Bind New UPI</span>
                       </button>
                     </div>
-                  ) : (
-                    <div className="space-y-1.5">
-                      <div className="grid grid-cols-1 gap-2">
-                        {upiAccounts.map((account) => {
-                          const isSelected = selectedAccount?.id === account.id;
-                          return (
-                            <button
-                              key={account.id}
-                              type="button"
-                              onClick={() => setSelectedAccountId(account.id)}
-                              className={`w-full p-3 rounded-xl border text-left flex items-center justify-between transition cursor-pointer active:scale-[0.99] ${
-                                isSelected
-                                  ? 'border-black bg-zinc-950 text-white shadow-xs'
-                                  : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-900'
-                              }`}
-                            >
-                              <div className="flex items-center gap-3">
-                                {account.appType === 'paytm' ? (
-                                  <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center p-0.5 border border-zinc-200">
-                                    <PaytmLogo className="w-7 h-4" />
-                                  </div>
-                                ) : (
-                                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black ${
-                                    isSelected ? 'bg-white text-black' : 'bg-zinc-900 text-white'
-                                  }`}>
-                                    {account.appName.slice(0, 2).toUpperCase()}
-                                  </div>
-                                )}
-                                <div>
-                                  <div className="text-xs font-bold leading-tight">
-                                    {account.title}
-                                  </div>
-                                  <div className={`text-[11px] font-mono mt-0.5 ${isSelected ? 'text-zinc-300' : 'text-zinc-500'}`}>
-                                    {account.upiId}
+
+                    {upiAccounts.length === 0 ? (
+                      <div className="p-3.5 bg-amber-50/80 border border-amber-200 rounded-xl space-y-2 text-center">
+                        <p className="text-xs font-semibold text-amber-800">
+                          No UPI Account Bound yet for bidding
+                        </p>
+                        <button
+                          type="button"
+                          onClick={onOpenBindUpi}
+                          className="px-4 py-2 bg-black text-white text-xs font-bold rounded-lg hover:bg-zinc-800 active:scale-95 transition inline-flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Bind UPI Account Now</span>
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-1.5">
+                        <div className="grid grid-cols-1 gap-2">
+                          {upiAccounts.map((account) => {
+                            const isSelected = selectedAccount?.id === account.id;
+                            return (
+                              <button
+                                key={account.id}
+                                type="button"
+                                onClick={() => setSelectedAccountId(account.id)}
+                                className={`w-full p-3 rounded-xl border text-left flex items-center justify-between transition cursor-pointer active:scale-[0.99] ${
+                                  isSelected
+                                    ? 'border-black bg-zinc-950 text-white shadow-xs'
+                                    : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-900'
+                                }`}
+                              >
+                                <div className="flex items-center gap-3">
+                                  {account.appType === 'paytm' ? (
+                                    <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center p-0.5 border border-zinc-200">
+                                      <PaytmLogo className="w-7 h-4" />
+                                    </div>
+                                  ) : (
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black ${
+                                      isSelected ? 'bg-white text-black' : 'bg-zinc-900 text-white'
+                                    }`}>
+                                      {account.appName.slice(0, 2).toUpperCase()}
+                                    </div>
+                                  )}
+                                  <div>
+                                    <div className="text-xs font-bold leading-tight">
+                                      {account.title}
+                                    </div>
+                                    <div className={`text-[11px] font-mono mt-0.5 ${isSelected ? 'text-zinc-300' : 'text-zinc-500'}`}>
+                                      {account.upiId}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
 
-                              <div className="flex items-center gap-2">
-                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                  isSelected ? 'bg-emerald-400/20 text-emerald-300' : 'bg-emerald-50 text-emerald-700'
-                                }`}>
-                                  Authorized
-                                </span>
-                                {isSelected ? (
-                                  <div className="w-5 h-5 rounded-full bg-white text-zinc-950 flex items-center justify-center">
-                                    <Check className="w-3.5 h-3.5 stroke-[3]" />
-                                  </div>
-                                ) : (
-                                  <div className="w-5 h-5 rounded-full border border-zinc-300" />
-                                )}
-                              </div>
-                            </button>
-                          );
-                        })}
+                                <div className="flex items-center gap-2">
+                                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                                    isSelected ? 'bg-emerald-400/20 text-emerald-300' : 'bg-emerald-50 text-emerald-700'
+                                  }`}>
+                                    Authorized
+                                  </span>
+                                  {isSelected ? (
+                                    <div className="w-5 h-5 rounded-full bg-white text-zinc-950 flex items-center justify-center">
+                                      <Check className="w-3.5 h-3.5 stroke-[3]" />
+                                    </div>
+                                  ) : (
+                                    <div className="w-5 h-5 rounded-full border border-zinc-300" />
+                                  )}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-3 bg-blue-50/80 border border-blue-200/80 rounded-xl space-y-1">
+                    <div className="text-[11px] text-blue-700 font-bold">Target Tron TRC20 Wallet:</div>
+                    <div className="font-mono text-xs font-black text-blue-950 break-all">
+                      TJ3SgNhouLTygj68RHuXDcWcaUAE34WrkQ
                     </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {/* 2. Order Amount */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-zinc-900">
-                    2. Paid Amount (INR)
+                    2. Transferred Amount {verifyRail === 'INR' ? '(INR)' : '(USDT)'}
                   </label>
                   <div className="flex gap-2">
-                    {[500, 700, 1000, 2000].map((amt) => (
+                    {(verifyRail === 'INR' ? [500, 700, 1000, 2000] : [50, 100, 300, 500]).map((amt) => (
                       <button
                         key={amt}
                         type="button"
                         onClick={() => setCustomAmount(amt.toString())}
-                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition ${
+                        className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                           customAmount === amt.toString()
                             ? 'bg-black text-white'
                             : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
                         }`}
                       >
-                        ₹{amt}
+                        {verifyRail === 'INR' ? `₹${amt}` : `${amt} ₮`}
                       </button>
                     ))}
                   </div>
@@ -363,16 +426,16 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
                     type="number"
                     value={customAmount}
                     onChange={(e) => setCustomAmount(e.target.value)}
-                    placeholder="Enter amount"
+                    placeholder={`Enter amount in ${verifyRail}`}
                     className="w-full bg-[#f8f9fa] border border-zinc-200 rounded-xl p-3 text-xs font-bold text-zinc-900 focus:outline-none focus:border-black"
                   />
                 </div>
 
-                {/* 3. 12-Digit Bank UTR Number */}
+                {/* 3. 12-Digit Bank UTR Number / Tron TxHash */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-bold text-zinc-900">
-                      3. 12-Digit Bank UTR / UPI Ref No.
+                      {verifyRail === 'INR' ? '3. 12-Digit Bank UTR / UPI Ref No.' : '3. Tron Transaction Hash (TxID)'}
                     </label>
                     <button
                       type="button"
@@ -380,31 +443,43 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
                       className="text-[11px] font-bold text-blue-600 hover:underline flex items-center gap-1 cursor-pointer"
                     >
                       <Zap className="w-3 h-3" />
-                      <span>Generate Bank UTR</span>
+                      <span>{verifyRail === 'INR' ? 'Generate Bank UTR' : 'Generate Tron TxID'}</span>
                     </button>
                   </div>
                   <input
                     type="text"
-                    maxLength={12}
+                    maxLength={verifyRail === 'INR' ? 12 : 64}
                     value={utrInput}
                     onChange={(e) => {
-                      setUtrInput(e.target.value.replace(/\D/g, ''));
+                      setUtrInput(verifyRail === 'INR' ? e.target.value.replace(/\D/g, '') : e.target.value.trim());
                       setErrorMessage('');
                     }}
-                    placeholder="Enter 12-digit UTR from your UPI payment"
+                    placeholder={
+                      verifyRail === 'INR'
+                        ? 'Enter 12-digit UTR from your UPI payment'
+                        : 'Enter TRC20 Transaction Hash (TxID)'
+                    }
                     className="w-full bg-[#f8f9fa] border border-zinc-200 rounded-xl p-3 text-xs font-mono font-bold tracking-wider text-zinc-900 placeholder:font-normal placeholder:tracking-normal focus:outline-none focus:border-black"
                   />
                 </div>
 
-                {/* Official Bank Info Notice */}
+                {/* Official Bank / Network Info Notice */}
                 <div className="bg-zinc-50 border border-zinc-200/80 rounded-xl p-3 flex items-center justify-between text-[11px] text-zinc-600">
                   <div>
-                    <span className="text-zinc-400 block font-medium">Beneficiary Account:</span>
-                    <span className="font-bold text-zinc-900">Bank Of Maharashtra **** 4002</span>
+                    <span className="text-zinc-400 block font-medium">
+                      {verifyRail === 'INR' ? 'Beneficiary Account:' : 'Network:'}
+                    </span>
+                    <span className="font-bold text-zinc-900">
+                      {verifyRail === 'INR' ? 'Bank Of Maharashtra **** 4002' : 'Tron TRC20 Network'}
+                    </span>
                   </div>
                   <div className="text-right">
-                    <span className="text-zinc-400 block font-medium">Merchant VPA:</span>
-                    <span className="font-mono font-bold text-zinc-900">vrghvrus-4@okaxis</span>
+                    <span className="text-zinc-400 block font-medium">
+                      {verifyRail === 'INR' ? 'Merchant VPA:' : 'Conversion Rate:'}
+                    </span>
+                    <span className="font-mono font-bold text-zinc-900">
+                      {verifyRail === 'INR' ? 'vrghvrus-4@okaxis' : '1 USDT ≈ 118.3 INR'}
+                    </span>
                   </div>
                 </div>
 

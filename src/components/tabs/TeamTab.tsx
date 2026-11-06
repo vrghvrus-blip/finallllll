@@ -79,9 +79,18 @@ export const TeamAvatar: React.FC<{ className?: string }> = ({ className = 'w-12
 export const TeamTab: React.FC<TeamTabProps> = ({
   user,
   teamMembers = [],
+  onAddTeammate,
+  onShowShareModal,
 }) => {
   const [copied, setCopied] = useState(false);
   const [selectedMember, setSelectedMember] = useState<TeamMember | null>(null);
+
+  // Invite & Partner Simulation Modal State
+  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [partnerPhone, setPartnerPhone] = useState('');
+  const [partnerTier, setPartnerTier] = useState<1 | 2>(1);
+  const [partnerVolume, setPartnerVolume] = useState('2000');
+  const [modalError, setModalError] = useState('');
 
   // Invite URL matching the screenshot format
   const inviteCode = user.inviteCode || '0edatgwpa7r5';
@@ -92,6 +101,39 @@ export const TeamTab: React.FC<TeamTabProps> = ({
     navigator.clipboard.writeText(fullInviteUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleGenerateSamplePartner = () => {
+    const randomPhone = `98${Math.floor(10000000 + Math.random() * 90000000)}`;
+    setPartnerPhone(randomPhone);
+    setModalError('');
+  };
+
+  const handleConfirmAddPartner = (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanPhone = partnerPhone.trim();
+    if (!cleanPhone || cleanPhone.length < 8) {
+      setModalError('Please enter a valid phone number (at least 8 digits)');
+      return;
+    }
+    const volume = parseFloat(partnerVolume) || 1000;
+    const commRate = partnerTier === 1 ? 0.10 : 0.05;
+    const commEarned = Math.round(volume * commRate);
+
+    if (onAddTeammate) {
+      onAddTeammate({
+        name: `Teammate ${cleanPhone.slice(-4)}`,
+        phone: cleanPhone,
+        tier: partnerTier,
+        tradingVolume: volume,
+        commissionEarned: commEarned,
+        status: 'Active',
+      });
+    }
+
+    setIsInviteModalOpen(false);
+    setPartnerPhone('');
+    setModalError('');
   };
 
   // Commission and Team Recharge values based on real user state (0 by default)
@@ -167,7 +209,16 @@ export const TeamTab: React.FC<TeamTabProps> = ({
 
       {/* Team Detail Section */}
       <div className="space-y-2 pt-1">
-        <h2 className="text-base font-bold text-black tracking-tight">Team Detail</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-bold text-black tracking-tight">Team Detail</h2>
+          <button
+            type="button"
+            onClick={() => setIsInviteModalOpen(true)}
+            className="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer transition active:scale-95"
+          >
+            <span>+ Simulate Teammate Order</span>
+          </button>
+        </div>
 
         {teamMembers.length === 0 ? (
           <div className="py-12 px-4 rounded-2xl bg-zinc-50 border border-zinc-100 flex flex-col items-center justify-center text-center">
@@ -279,6 +330,119 @@ export const TeamTab: React.FC<TeamTabProps> = ({
             >
               Close
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Partner Simulation Modal */}
+      {isInviteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-150">
+          <div className="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-3xl p-5 shadow-2xl relative space-y-4">
+            <div className="flex items-center justify-between pb-2 border-b border-zinc-100">
+              <div>
+                <h3 className="text-base font-bold text-zinc-950">Simulate Teammate Order</h3>
+                <p className="text-[11px] text-zinc-500">Register referral & earn multi-tier commission</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsInviteModalOpen(false)}
+                className="p-1.5 rounded-full text-zinc-400 hover:text-zinc-800 hover:bg-zinc-100 transition cursor-pointer"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleConfirmAddPartner} className="space-y-3 text-xs">
+              {modalError && (
+                <div className="p-2.5 bg-red-50 text-red-600 rounded-xl text-xs font-semibold">
+                  {modalError}
+                </div>
+              )}
+
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <label className="font-bold text-zinc-800">Teammate Phone Number</label>
+                  <button
+                    type="button"
+                    onClick={handleGenerateSamplePartner}
+                    className="text-[10px] font-bold text-blue-600 hover:underline cursor-pointer"
+                  >
+                    Generate Sample
+                  </button>
+                </div>
+                <input
+                  type="text"
+                  value={partnerPhone}
+                  onChange={(e) => setPartnerPhone(e.target.value.replace(/\D/g, ''))}
+                  placeholder="e.g. 9876543210"
+                  className="w-full bg-[#f8f9fa] border border-zinc-200 rounded-xl p-2.5 text-xs font-mono font-bold text-zinc-900 focus:outline-none focus:border-black"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-zinc-800">Referral Tier</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setPartnerTier(1)}
+                    className={`py-2 rounded-xl border text-center transition cursor-pointer ${
+                      partnerTier === 1
+                        ? 'border-black bg-zinc-900 text-white font-bold'
+                        : 'border-zinc-200 bg-zinc-50 text-zinc-700'
+                    }`}
+                  >
+                    <div>Tier 1 (Direct)</div>
+                    <div className="text-[10px] text-emerald-400 font-bold mt-0.5">10% Commission</div>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPartnerTier(2)}
+                    className={`py-2 rounded-xl border text-center transition cursor-pointer ${
+                      partnerTier === 2
+                        ? 'border-black bg-zinc-900 text-white font-bold'
+                        : 'border-zinc-200 bg-zinc-50 text-zinc-700'
+                    }`}
+                  >
+                    <div>Tier 2 (Indirect)</div>
+                    <div className="text-[10px] text-emerald-400 font-bold mt-0.5">5% Commission</div>
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="font-bold text-zinc-800">Teammate Trading Volume (INR)</label>
+                <div className="flex gap-1.5">
+                  {[1000, 2000, 5000, 10000].map((v) => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => setPartnerVolume(v.toString())}
+                      className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
+                        partnerVolume === v.toString()
+                          ? 'bg-black text-white'
+                          : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                      }`}
+                    >
+                      ₹{v}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="p-2.5 bg-emerald-50 border border-emerald-200/80 rounded-xl flex items-center justify-between text-xs text-emerald-900 font-bold">
+                <span>Earned Commission:</span>
+                <span className="font-extrabold text-sm text-emerald-700">
+                  +₹{Math.round((parseFloat(partnerVolume) || 0) * (partnerTier === 1 ? 0.10 : 0.05))}
+                </span>
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 bg-black hover:bg-zinc-800 text-white rounded-xl font-bold text-xs shadow-sm transition active:scale-95 cursor-pointer"
+              >
+                Register & Credit Commission
+              </button>
+            </form>
           </div>
         </div>
       )}

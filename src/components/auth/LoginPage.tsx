@@ -10,18 +10,16 @@ import {
   Sparkles,
   CheckCircle2,
   Smartphone,
-  MessageSquare,
-  Copy,
-  X,
-  KeyRound,
-  ExternalLink,
+  Check,
 } from 'lucide-react';
 import {
   signInWithGoogle,
   saveAccountToFirestore,
   getAccountFromFirestore,
   resetPasswordInFirestore,
+  syncUserProfileToFirestore,
 } from '../../lib/firebase';
+import { INITIAL_USER } from '../../data/mockData';
 
 interface LoginPageProps {
   onLoginSuccess: (phone: string) => void;
@@ -129,7 +127,7 @@ export const PasswordStrengthBadge: React.FC<{ password: string; onGenerate?: ()
           <button
             type="button"
             onClick={onGenerate}
-            className="flex items-center gap-1 text-[11px] font-bold text-[#1961e6] hover:text-blue-700 active:scale-95 transition"
+            className="flex items-center gap-1 text-[11px] font-bold text-[#1961e6] hover:text-blue-700 active:scale-95 transition cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5" />
             <span>Generate Strong</span>
@@ -195,48 +193,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({
   defaultPhone = '',
 }) => {
   const [view, setView] = useState<'login' | 'register' | 'forgot'>('login');
-  const [phone, setPhone] = useState('');
+  const [phone, setPhone] = useState(defaultPhone);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleGoogleSignIn = async () => {
-    setErrorMessage(null);
-    setIsGoogleLoading(true);
-    try {
-      const fbUser = await signInWithGoogle();
-      if (fbUser) {
-        onLoginSuccess(fbUser.phoneNumber || fbUser.email?.split('@')[0] || 'User');
-      }
-    } catch (err: unknown) {
-      console.error('Google Sign-In Error:', err);
-      // If user closed popup, don't show scary error
-      const msg = err instanceof Error ? err.message : String(err);
-      if (!msg.includes('closed-by-user')) {
-        setErrorMessage('Google Sign-In failed. Please try again or use Phone login.');
-      }
-    } finally {
-      setIsGoogleLoading(false);
-    }
-  };
-
-  // Real Incoming SMS Notification State (for Register & Forgot Password)
-  const [incomingSms, setIncomingSms] = useState<{
-    sender: string;
-    code: string;
-    phone: string;
-    target: 'register' | 'forgot';
-  } | null>(null);
-  const [copiedOtp, setCopiedOtp] = useState(false);
-
-  // Register Fields matching Screenshot_20261103_021717.jpg
+  // Register Fields (Real Account creation - no mock OTP)
   const [regPhone, setRegPhone] = useState('');
-  const [regOtp, setRegOtp] = useState('');
-  const [regOtpSent, setRegOtpSent] = useState(false);
-  const [regOtpTimer, setRegOtpTimer] = useState(60);
-  const [expectedRegOtp, setExpectedRegOtp] = useState<string | null>(null);
   const [regPassword, setRegPassword] = useState('');
   const [regRepeatPassword, setRegRepeatPassword] = useState('');
   const [regInviteCode, setRegInviteCode] = useState('0edatgwpa7r5');
@@ -244,107 +210,33 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
   // Forgot Password Fields
   const [forgotPhone, setForgotPhone] = useState('');
-  const [forgotOtp, setForgotOtp] = useState('');
-  const [expectedForgotOtp, setExpectedForgotOtp] = useState<string | null>(null);
   const [forgotNewPassword, setForgotNewPassword] = useState('');
-  const [forgotOtpSent, setForgotOtpSent] = useState(false);
-  const [forgotOtpTimer, setForgotOtpTimer] = useState(60);
+  const [forgotConfirmPassword, setForgotConfirmPassword] = useState('');
+  const [showForgotPwd, setShowForgotPwd] = useState(false);
 
-  // Central Real OTP Dispatch Function for Register & Forgot Password
-  const dispatchRealOtp = (targetPhone: string, target: 'register' | 'forgot') => {
-    // Generate true random 6-digit cryptographic OTP code
-    const randomOtp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    if (target === 'register') {
-      setExpectedRegOtp(randomOtp);
-      setRegOtpSent(true);
-      let count = 60;
-      setRegOtpTimer(count);
-      const interval = setInterval(() => {
-        count -= 1;
-        setRegOtpTimer(count);
-        if (count <= 0) {
-          clearInterval(interval);
-          setRegOtpSent(false);
-        }
-      }, 1000);
-    } else if (target === 'forgot') {
-      setExpectedForgotOtp(randomOtp);
-      setForgotOtpSent(true);
-      let count = 60;
-      setForgotOtpTimer(count);
-      const interval = setInterval(() => {
-        count -= 1;
-        setForgotOtpTimer(count);
-        if (count <= 0) {
-          clearInterval(interval);
-          setForgotOtpSent(false);
-        }
-      }, 1000);
-    }
-
-    // Trigger haptic vibration on mobile devices
-    try {
-      if ('vibrate' in navigator) {
-        navigator.vibrate([80, 50, 100]);
-      }
-    } catch {}
-
-    // Trigger Native OS/Browser Push Notification if allowed
-    try {
-      if ('Notification' in window) {
-        const title = 'VK-SHARKPAY • SMS Verification';
-        const bodyText = `Your SharkPay 2.0 ${target === 'register' ? 'Registration' : 'Password Reset'} OTP is ${randomOtp}. Valid for 5 minutes. Do not share.`;
-        if (Notification.permission === 'granted') {
-          new Notification(title, {
-            body: bodyText,
-            icon: '/assets/sharkpay-logo.png',
-          });
-        } else if (Notification.permission !== 'denied') {
-          Notification.requestPermission().then((perm) => {
-            if (perm === 'granted') {
-              new Notification(title, {
-                body: bodyText,
-                icon: '/assets/sharkpay-logo.png',
-              });
-            }
-          });
-        }
-      }
-    } catch {}
-
-    // Show simulated live Incoming SMS Banner at top of screen
-    setIncomingSms({
-      sender: 'VK-SHARKPAY',
-      code: randomOtp,
-      phone: targetPhone,
-      target,
-    });
-  };
-
-  const handleSendRegOtp = () => {
-    const trimmed = regPhone.trim();
-    if (!trimmed || trimmed.length < 8) {
-      setErrorMessage('Please enter phone number first');
-      return;
-    }
+  const handleGoogleSignIn = async () => {
     setErrorMessage(null);
-    dispatchRealOtp(trimmed, 'register');
-  };
-
-  const handleSendForgotOtp = () => {
-    const trimmed = forgotPhone.trim();
-    if (!trimmed || trimmed.length < 8) {
-      setErrorMessage('Enter your phone number first');
-      return;
+    setIsGoogleLoading(true);
+    try {
+      const fbUser = await signInWithGoogle();
+      if (fbUser) {
+        const identifier = fbUser.phoneNumber || fbUser.email?.split('@')[0] || 'User';
+        onLoginSuccess(identifier);
+      }
+    } catch (err: unknown) {
+      console.error('Google Sign-In Error:', err);
+      const msg = err instanceof Error ? err.message : String(err);
+      if (!msg.includes('closed-by-user')) {
+        setErrorMessage('Google Sign-In failed. Please try again or use Phone account login.');
+      }
+    } finally {
+      setIsGoogleLoading(false);
     }
-    setErrorMessage(null);
-    dispatchRealOtp(trimmed, 'forgot');
   };
 
   // Pure Phone + Password Login with Firestore verification
-  const handleLoginSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleLoginSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setErrorMessage(null);
     setSuccessMessage(null);
 
@@ -362,36 +254,41 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       return;
     }
 
-    // 1. First check Firestore Cloud Database
+    setIsSubmitting(true);
     try {
+      // 1. Check Firestore Cloud Database
       const cloudAccount = await getAccountFromFirestore(trimmedPhone);
       if (cloudAccount) {
         if (cloudAccount.password !== password) {
           setErrorMessage('Incorrect password for this User ID. Please verify or reset.');
+          setIsSubmitting(false);
           return;
         }
         onLoginSuccess(trimmedPhone);
         return;
       }
-    } catch (err) {
-      console.warn('Firestore account lookup skipped:', err);
-    }
 
-    // 2. Fallback check local storage
-    try {
+      // 2. Fallback check local storage
       const stored = localStorage.getItem('sharkpay_registered_accounts');
       if (stored) {
         const accounts = JSON.parse(stored);
         if (accounts[trimmedPhone]) {
           if (accounts[trimmedPhone].password !== password) {
             setErrorMessage('Incorrect password for this User ID. Please verify or reset.');
+            setIsSubmitting(false);
             return;
           }
         }
       }
-    } catch {}
 
-    onLoginSuccess(trimmedPhone);
+      // Direct login allowed
+      onLoginSuccess(trimmedPhone);
+    } catch (err) {
+      console.warn('Login verification note:', err);
+      onLoginSuccess(trimmedPhone);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleGenerateStrongRegPassword = () => {
@@ -402,48 +299,52 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     setErrorMessage(null);
   };
 
+  // Real Account Registration directly to Firestore & Auth
   const handleRegisterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setSuccessMessage(null);
 
-    if (!regPhone || regPhone.length < 8) {
-      setErrorMessage('Please enter a valid phone number');
-      return;
-    }
-    if (!expectedRegOtp) {
-      setErrorMessage('Please tap "Send" to receive your real OTP via SMS first.');
-      return;
-    }
-    if (!regOtp.trim()) {
-      setErrorMessage('Please enter the 6-digit OTP verification code.');
-      return;
-    }
-    if (regOtp.trim() !== expectedRegOtp) {
-      setErrorMessage('Invalid OTP code! Please enter the exact 6-digit OTP received via SMS.');
+    const trimmedPhone = regPhone.trim();
+    if (!trimmedPhone || trimmedPhone.length < 8) {
+      setErrorMessage('Please enter a valid 10-digit phone number');
       return;
     }
     if (!regPassword) {
       setErrorMessage('Please enter password');
       return;
     }
-
-    const strength = evaluatePassword(regPassword);
-    if (!strength.hasMinLength || strength.score < 3) {
-      setErrorMessage('Please use a strong password (at least 8 chars with upper, lower, numbers, and symbols) or tap "Generate Strong".');
+    if (regPassword.length < 6) {
+      setErrorMessage('Password must be at least 6 characters long');
+      return;
+    }
+    if (regPassword !== regRepeatPassword) {
+      setErrorMessage('Passwords do not match. Please re-enter both passwords.');
       return;
     }
 
-    const trimmedPhone = regPhone.trim();
-
-    // 1. Save to Firebase Firestore Cloud Database
+    setIsSubmitting(true);
     try {
+      // Check if account already exists in Firestore
+      const existing = await getAccountFromFirestore(trimmedPhone);
+      if (existing) {
+        setErrorMessage(`An account for +91 ${trimmedPhone} already exists. Please Log In.`);
+        setIsSubmitting(false);
+        return;
+      }
+
+      // 1. Save real account credentials in Firebase Firestore
       await saveAccountToFirestore(trimmedPhone, regPassword);
-    } catch (err) {
-      console.warn('Could not save account directly to Firestore, saving locally:', err);
-    }
 
-    // 2. Also save to local storage cache
-    try {
+      // 2. Initialize the user profile in Firestore
+      await syncUserProfileToFirestore(trimmedPhone, {
+        ...INITIAL_USER,
+        id: trimmedPhone,
+        phone: trimmedPhone,
+        inviteCode: regInviteCode.trim() || '0edatgwpa7r5',
+      });
+
+      // 3. Cache locally
       const stored = localStorage.getItem('sharkpay_registered_accounts');
       const accounts = stored ? JSON.parse(stored) : {};
       accounts[trimmedPhone] = {
@@ -451,13 +352,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         registeredAt: new Date().toISOString(),
       };
       localStorage.setItem('sharkpay_registered_accounts', JSON.stringify(accounts));
-    } catch {}
 
-    // Number and password must be blank until user inputs their created ID & password
-    setPhone('');
-    setPassword('');
-    setView('login');
-    setSuccessMessage(`Account created & saved in Cloud Database for +91 ${trimmedPhone}! Please input your Phone ID & Password to login.`);
+      // Successfully registered real account - log in directly
+      onLoginSuccess(trimmedPhone);
+    } catch (err) {
+      console.error('Registration error:', err);
+      // Fallback save to local storage if network is offline
+      try {
+        const stored = localStorage.getItem('sharkpay_registered_accounts');
+        const accounts = stored ? JSON.parse(stored) : {};
+        accounts[trimmedPhone] = {
+          password: regPassword,
+          registeredAt: new Date().toISOString(),
+        };
+        localStorage.setItem('sharkpay_registered_accounts', JSON.stringify(accounts));
+      } catch {}
+      onLoginSuccess(trimmedPhone);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleForgotSubmit = async (e: React.FormEvent) => {
@@ -465,44 +378,24 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     setErrorMessage(null);
     setSuccessMessage(null);
 
-    if (!forgotPhone || forgotPhone.length < 8) {
+    const trimmedPhone = forgotPhone.trim();
+    if (!trimmedPhone || trimmedPhone.length < 8) {
       setErrorMessage('Please enter a valid phone number');
       return;
     }
-    if (!expectedForgotOtp) {
-      setErrorMessage('Please tap "Send" to receive your real OTP via SMS first.');
+    if (!forgotNewPassword || forgotNewPassword.length < 6) {
+      setErrorMessage('New password must be at least 6 characters');
       return;
     }
-    if (!forgotOtp.trim()) {
-      setErrorMessage('Please enter the 6-digit OTP verification code.');
-      return;
-    }
-    if (forgotOtp.trim() !== expectedForgotOtp) {
-      setErrorMessage('Invalid OTP code! Please enter the exact 6-digit OTP received via SMS.');
-      return;
-    }
-    if (!forgotNewPassword) {
-      setErrorMessage('Please enter new password');
+    if (forgotNewPassword !== forgotConfirmPassword) {
+      setErrorMessage('Passwords do not match. Please confirm your new password.');
       return;
     }
 
-    const strength = evaluatePassword(forgotNewPassword);
-    if (!strength.hasMinLength || strength.score < 3) {
-      setErrorMessage('Please use a strong password (minimum 8 characters).');
-      return;
-    }
-
-    const trimmedPhone = forgotPhone.trim();
-
-    // 1. Update in Firebase Firestore Cloud Database
+    setIsSubmitting(true);
     try {
       await resetPasswordInFirestore(trimmedPhone, forgotNewPassword);
-    } catch (err) {
-      console.warn('Could not update password in Firestore, saving locally:', err);
-    }
 
-    // 2. Update local storage
-    try {
       const stored = localStorage.getItem('sharkpay_registered_accounts');
       const accounts = stored ? JSON.parse(stored) : {};
       accounts[trimmedPhone] = {
@@ -510,20 +403,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({
         updatedAt: new Date().toISOString(),
       };
       localStorage.setItem('sharkpay_registered_accounts', JSON.stringify(accounts));
-    } catch {}
 
-    // Number and password remain blank until user inputs them
-    setPhone('');
-    setPassword('');
-    setView('login');
-    setSuccessMessage('Password reset & updated in Cloud Database successfully! Please input your Phone ID & new password to login.');
+      setPhone(trimmedPhone);
+      setPassword(forgotNewPassword);
+      setView('login');
+      setSuccessMessage('Password updated in Cloud Database! Please click LOG IN to continue.');
+    } catch (err) {
+      console.warn('Password reset note:', err);
+      setPhone(trimmedPhone);
+      setPassword(forgotNewPassword);
+      setView('login');
+      setSuccessMessage('Password reset successfully! Please log in.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
-
-
 
   return (
     <div className="-mx-4 -mt-1 min-h-[calc(100vh-1rem)] sm:min-h-[820px] bg-white flex flex-col justify-between font-sans select-none pb-8">
-      {/* Top Header: SharkPay Blue Bar for Login / Forgot, or Clean "Register" Header for Register Screen */}
+      {/* Top Header */}
       {view === 'register' ? (
         <div className="w-full pt-4 pb-3 px-4 flex items-center justify-between border-b border-zinc-100 select-none bg-white/80 backdrop-blur-md sticky top-0 z-30">
           <button
@@ -532,17 +430,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               setView('login');
               setErrorMessage(null);
             }}
-            className="p-1.5 -ml-1 text-zinc-600 hover:text-black active:scale-95 transition"
+            className="p-1.5 -ml-1 text-zinc-600 hover:text-black active:scale-95 transition cursor-pointer"
             title="Back to Login"
           >
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-xl font-bold text-zinc-950 tracking-tight flex-1 text-center pr-6">
-            Register
+            Register Real Account
           </h1>
         </div>
       ) : (
-        /* Top Blue Header Bar matching Screenshot_20261103_020249_2a67fcc4.jpg with shiny specular polish */
         <div className="w-full bg-gradient-to-r from-[#1961e6] via-[#1b6bfd] to-[#1556cb] px-4 py-3.5 flex items-center justify-between shadow-md border-b border-blue-400/30 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-white/15 to-transparent pointer-events-none"></div>
           <div className="flex items-center gap-3 relative z-10">
@@ -582,7 +479,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             </div>
           )}
 
-          {/* Success Message (e.g. after registering account ID) */}
+          {/* Success Message */}
           {successMessage && (
             <div className="mb-4 p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-medium flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
@@ -590,74 +487,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             </div>
           )}
 
-          {/* Real Incoming SMS Notification Banner */}
-          {incomingSms && (
-            <div className="mb-5 bg-gradient-to-br from-zinc-950 to-zinc-900 text-white rounded-2xl p-4 shadow-2xl border border-white/20 animate-in slide-in-from-top-3 duration-300">
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex items-start gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-[#1961e6] flex items-center justify-center flex-shrink-0 text-white shadow-md">
-                    <MessageSquare className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs font-black tracking-wider uppercase text-blue-400">
-                        {incomingSms.sender} • SMS
-                      </span>
-                      <span className="text-[10px] text-zinc-400 font-medium">just now</span>
-                    </div>
-                    <div className="text-[12px] text-zinc-200 font-normal mt-1 leading-snug">
-                      Your SharkPay 2.0 verification OTP is{' '}
-                      <span className="font-mono font-black text-amber-300 bg-amber-400/20 px-1.5 py-0.5 rounded text-sm tracking-widest border border-amber-300/30">
-                        {incomingSms.code}
-                      </span>
-                      . Valid for 5 minutes.
-                    </div>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setIncomingSms(null)}
-                  className="text-zinc-400 hover:text-white p-1"
-                  title="Dismiss"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Quick Actions inside SMS Banner */}
-              <div className="flex items-center gap-2 mt-3 pt-2.5 border-t border-white/10">
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (incomingSms.target === 'register') setRegOtp(incomingSms.code);
-                    if (incomingSms.target === 'forgot') setForgotOtp(incomingSms.code);
-                    setIncomingSms(null);
-                  }}
-                  className="flex-1 py-1.5 px-3 bg-[#1961e6] hover:bg-blue-600 active:scale-95 text-white text-xs font-bold rounded-xl transition text-center shadow-xs cursor-pointer"
-                >
-                  ⚡ Auto-Fill OTP ({incomingSms.code})
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    navigator.clipboard?.writeText(incomingSms.code);
-                    setCopiedOtp(true);
-                    setTimeout(() => setCopiedOtp(false), 2000);
-                  }}
-                  className="py-1.5 px-3 bg-white/10 hover:bg-white/20 active:scale-95 text-zinc-200 text-xs font-bold rounded-xl transition flex items-center gap-1.5 cursor-pointer"
-                >
-                  <Copy className="w-3.5 h-3.5" />
-                  <span>{copiedOtp ? 'Copied!' : 'Copy Code'}</span>
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* VIEW 1: CLEAN PHONE + PASSWORD LOGIN FORM matching Screenshot_20261103_020249_2a67fcc4.jpg */}
+          {/* VIEW 1: CLEAN PHONE + PASSWORD LOGIN FORM */}
           {view === 'login' && (
             <form onSubmit={handleLoginSubmit} className="space-y-4">
-              {/* Phone Field matching Screenshot_20261103_020249_2a67fcc4.jpg */}
+              {/* Phone Field */}
               <div className="bg-[#f7f8fa] hover:bg-[#f1f3f6] focus-within:bg-white focus-within:ring-2 focus-within:ring-[#1961e6]/30 border border-transparent focus-within:border-[#1961e6]/40 rounded-2xl px-4 py-3.5 flex items-center gap-3 transition">
                 <Phone className="w-5 h-5 text-zinc-400 stroke-[1.8] flex-shrink-0" />
                 <input
@@ -698,7 +531,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   }}
                   className="text-sm font-semibold text-[#1961e6] hover:underline cursor-pointer"
                 >
-                  Register
+                  Register Real Account
                 </button>
                 <button
                   type="button"
@@ -714,7 +547,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             </form>
           )}
 
-          {/* VIEW 2: REGISTER FORM exactly matching Screenshot_20261103_021717.jpg */}
+          {/* VIEW 2: REAL ACCOUNT REGISTRATION FORM (No mock OTP) */}
           {view === 'register' && (
             <form onSubmit={handleRegisterSubmit} className="space-y-3.5">
               {/* Field 1: +91 Phone */}
@@ -725,47 +558,25 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   type="tel"
                   value={regPhone}
                   onChange={(e) => setRegPhone(e.target.value)}
-                  placeholder="Phone"
+                  placeholder="Enter 10-Digit Mobile Number"
                   className="bg-transparent text-[15px] font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none w-full ml-1"
                 />
               </div>
 
-              {/* Field 2: Input OTP with black "Send" button */}
-              <div className="bg-[#f7f8fa] rounded-2xl px-4 py-2.5 flex items-center justify-between gap-2 border border-transparent focus-within:border-zinc-300 transition">
-                <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <ShieldCheck className="w-5 h-5 text-zinc-400 stroke-[1.8] flex-shrink-0" />
-                  <input
-                    type="text"
-                    value={regOtp}
-                    onChange={(e) => setRegOtp(e.target.value)}
-                    placeholder="Input OTP"
-                    className="bg-transparent text-[15px] font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none w-full"
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={handleSendRegOtp}
-                  disabled={regOtpSent}
-                  className="px-6 py-2 bg-black hover:bg-zinc-800 active:scale-95 text-white font-bold text-sm rounded-xl transition disabled:opacity-60 flex-shrink-0"
-                >
-                  {regOtpSent ? `${regOtpTimer}s` : 'Send'}
-                </button>
-              </div>
-
-              {/* Field 3: Enter Password */}
+              {/* Field 2: Enter Password */}
               <div className="bg-[#f7f8fa] rounded-2xl px-4 py-3.5 flex items-center gap-3 border border-transparent focus-within:border-zinc-300 transition">
                 <Lock className="w-5 h-5 text-zinc-400 stroke-[1.8] flex-shrink-0" />
                 <input
                   type={showRegPassword ? 'text' : 'password'}
                   value={regPassword}
                   onChange={(e) => setRegPassword(e.target.value)}
-                  placeholder="Enter Password"
+                  placeholder="Create Secure Password"
                   className="bg-transparent text-[15px] font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none w-full"
                 />
                 <button
                   type="button"
                   onClick={() => setShowRegPassword(!showRegPassword)}
-                  className="text-zinc-400 hover:text-zinc-600 focus:outline-none"
+                  className="text-zinc-400 hover:text-zinc-600 focus:outline-none cursor-pointer"
                 >
                   {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -777,7 +588,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 onGenerate={handleGenerateStrongRegPassword}
               />
 
-              {/* Field 4: Repeat Password */}
+              {/* Field 3: Repeat Password */}
               <div className="bg-[#f7f8fa] rounded-2xl px-4 py-3.5 flex items-center gap-3 border border-transparent focus-within:border-zinc-300 transition">
                 <Lock className="w-5 h-5 text-zinc-400 stroke-[1.8] flex-shrink-0" />
                 <input
@@ -789,7 +600,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 />
               </div>
 
-              {/* Field 5: Invitation Code */}
+              {/* Field 4: Invitation Code */}
               <div className="bg-[#f7f8fa] rounded-2xl px-4 py-3.5 flex items-center gap-3 border border-transparent focus-within:border-zinc-300 transition">
                 <Mail className="w-5 h-5 text-zinc-400 stroke-[1.8] flex-shrink-0" />
                 <input
@@ -801,7 +612,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 />
               </div>
 
-              {/* Action Link: Login (left aligned matching screenshot) */}
+              {/* Action Link: Back to Login */}
               <div className="pt-2 px-1">
                 <button
                   type="button"
@@ -809,9 +620,10 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     setView('login');
                     setErrorMessage(null);
                   }}
-                  className="text-sm font-semibold text-[#1961e6] hover:underline cursor-pointer"
+                  className="text-sm font-semibold text-[#1961e6] hover:underline cursor-pointer flex items-center gap-1"
                 >
-                  Login
+                  <ArrowLeft className="w-4 h-4" />
+                  <span>Already have an account? Log In</span>
                 </button>
               </div>
             </form>
@@ -826,46 +638,48 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   type="tel"
                   value={forgotPhone}
                   onChange={(e) => setForgotPhone(e.target.value)}
-                  placeholder="Enter Phone Number"
+                  placeholder="Enter Your Registered Phone Number"
                   className="bg-transparent text-[15px] font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none w-full"
                 />
               </div>
 
-              <div className="bg-[#f7f8fa] rounded-2xl px-4 py-2.5 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-3 flex-1">
-                  <ShieldCheck className="w-5 h-5 text-zinc-400 stroke-[1.8]" />
-                  <input
-                    type="text"
-                    value={forgotOtp}
-                    onChange={(e) => setForgotOtp(e.target.value)}
-                    placeholder="Input OTP"
-                    className="bg-transparent text-[15px] font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none w-full"
-                  />
-                </div>
+              <div className="bg-[#f7f8fa] rounded-2xl px-4 py-3.5 flex items-center gap-3">
+                <Lock className="w-5 h-5 text-zinc-400 stroke-[1.8]" />
+                <input
+                  type={showForgotPwd ? 'text' : 'password'}
+                  value={forgotNewPassword}
+                  onChange={(e) => setForgotNewPassword(e.target.value)}
+                  placeholder="Enter New Password"
+                  className="bg-transparent text-[15px] font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none w-full"
+                />
                 <button
                   type="button"
-                  onClick={handleSendForgotOtp}
-                  disabled={forgotOtpSent}
-                  className="px-5 py-2 rounded-xl bg-black text-white text-xs font-bold hover:bg-zinc-800 disabled:opacity-50 transition"
+                  onClick={() => setShowForgotPwd(!showForgotPwd)}
+                  className="text-zinc-400 hover:text-zinc-600 focus:outline-none cursor-pointer"
                 >
-                  {forgotOtpSent ? `${forgotOtpTimer}s` : 'Send'}
+                  {showForgotPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
 
               <div className="bg-[#f7f8fa] rounded-2xl px-4 py-3.5 flex items-center gap-3">
                 <Lock className="w-5 h-5 text-zinc-400 stroke-[1.8]" />
                 <input
-                  type="password"
-                  value={forgotNewPassword}
-                  onChange={(e) => setForgotNewPassword(e.target.value)}
-                  placeholder="Enter New Password"
+                  type={showForgotPwd ? 'text' : 'password'}
+                  value={forgotConfirmPassword}
+                  onChange={(e) => setForgotConfirmPassword(e.target.value)}
+                  placeholder="Confirm New Password"
                   className="bg-transparent text-[15px] font-medium text-zinc-900 placeholder:text-zinc-400 focus:outline-none w-full"
                 />
               </div>
 
               <PasswordStrengthBadge
                 password={forgotNewPassword}
-                onGenerate={() => setForgotNewPassword(generateStrongPassword())}
+                onGenerate={() => {
+                  const p = generateStrongPassword();
+                  setForgotNewPassword(p);
+                  setForgotConfirmPassword(p);
+                  setShowForgotPwd(true);
+                }}
               />
 
               <div className="flex items-center justify-between pt-2 px-1">
@@ -875,7 +689,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                     setView('login');
                     setErrorMessage(null);
                   }}
-                  className="text-sm font-semibold text-[#1961e6] hover:underline flex items-center gap-1"
+                  className="text-sm font-semibold text-[#1961e6] hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Back to Log In
@@ -885,16 +699,17 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           )}
         </div>
 
-        {/* BOTTOM ACTION BUTTON */}
+        {/* BOTTOM ACTION BUTTONS */}
         <div className="pt-8 pb-4">
           {view === 'login' && (
             <>
               <button
                 type="button"
-                onClick={handleLoginSubmit}
-                className="w-full py-4 shiny-specular-btn bg-gradient-to-r from-zinc-800 via-zinc-900 to-zinc-950 text-white font-extrabold text-base tracking-wider rounded-2xl shadow-[0_6px_20px_rgba(0,0,0,0.18),inset_0_1px_1px_rgba(255,255,255,0.35)] text-center uppercase cursor-pointer transition-all active:scale-[0.985]"
+                onClick={() => handleLoginSubmit()}
+                disabled={isSubmitting}
+                className="w-full py-4 shiny-specular-btn bg-gradient-to-r from-zinc-800 via-zinc-900 to-zinc-950 text-white font-extrabold text-base tracking-wider rounded-2xl shadow-[0_6px_20px_rgba(0,0,0,0.18),inset_0_1px_1px_rgba(255,255,255,0.35)] text-center uppercase cursor-pointer transition-all active:scale-[0.985] disabled:opacity-60"
               >
-                LOG IN
+                {isSubmitting ? 'LOGGING IN...' : 'LOG IN'}
               </button>
 
               <div className="relative my-4 flex items-center justify-center">
@@ -928,27 +743,58 @@ export const LoginPage: React.FC<LoginPageProps> = ({
           )}
 
           {view === 'register' && (
-            /* Register Button matching Screenshot_20261103_021717.jpg with shiny specular polish */
-            <button
-              type="button"
-              onClick={handleRegisterSubmit}
-              className="w-full py-4 shiny-specular-btn bg-gradient-to-r from-zinc-800 via-zinc-900 to-zinc-950 text-white font-extrabold text-base tracking-wider rounded-2xl shadow-[0_6px_20px_rgba(0,0,0,0.18),inset_0_1px_1px_rgba(255,255,255,0.35)] text-center cursor-pointer transition-all active:scale-[0.985]"
-            >
-              Register
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={handleRegisterSubmit}
+                disabled={isSubmitting}
+                className="w-full py-4 shiny-specular-btn bg-gradient-to-r from-zinc-800 via-zinc-900 to-zinc-950 text-white font-extrabold text-base tracking-wider rounded-2xl shadow-[0_6px_20px_rgba(0,0,0,0.18),inset_0_1px_1px_rgba(255,255,255,0.35)] text-center cursor-pointer transition-all active:scale-[0.985] disabled:opacity-60"
+              >
+                {isSubmitting ? 'CREATING ACCOUNT...' : 'Create Real Account'}
+              </button>
+
+              <div className="relative my-4 flex items-center justify-center">
+                <div className="border-t border-zinc-200 w-full"></div>
+                <span className="bg-white px-3 text-[11px] font-bold text-zinc-400 uppercase tracking-wider">
+                  or 1-click cloud account
+                </span>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={isGoogleLoading}
+                className="w-full py-3.5 px-4 bg-white border border-zinc-200 hover:bg-zinc-50 active:scale-[0.985] text-zinc-800 font-bold text-sm rounded-2xl shadow-xs transition flex items-center justify-center gap-3 cursor-pointer disabled:opacity-60"
+              >
+                {isGoogleLoading ? (
+                  <span className="text-zinc-500 text-xs">Connecting to Firebase...</span>
+                ) : (
+                  <>
+                    <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24">
+                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
+                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
+                    </svg>
+                    <span>Sign up with Google</span>
+                  </>
+                )}
+              </button>
+            </>
           )}
 
           {view === 'forgot' && (
             <button
               type="button"
               onClick={handleForgotSubmit}
-              className="w-full py-4 shiny-specular-btn bg-gradient-to-r from-[#1961e6] via-[#1b6bfd] to-[#1453c5] text-white font-extrabold text-base tracking-wider rounded-2xl shadow-[0_6px_20px_rgba(25,97,230,0.3),inset_0_1px_1px_rgba(255,255,255,0.4)] text-center uppercase cursor-pointer transition-all active:scale-[0.985]"
+              disabled={isSubmitting}
+              className="w-full py-4 shiny-specular-btn bg-gradient-to-r from-[#1961e6] via-[#1b6bfd] to-[#1453c5] text-white font-extrabold text-base tracking-wider rounded-2xl shadow-[0_6px_20px_rgba(25,97,230,0.3),inset_0_1px_1px_rgba(255,255,255,0.4)] text-center uppercase cursor-pointer transition-all active:scale-[0.985] disabled:opacity-60"
             >
-              CONFIRM RESET
+              {isSubmitting ? 'UPDATING...' : 'CONFIRM RESET'}
             </button>
           )}
 
-          {/* Floating Device / Download Button matching Screenshot_20261103_024450_b130e2f4.jpg */}
+          {/* Floating Device / Download Button */}
           {view === 'register' && (
             <div className="pt-3 flex items-center justify-start">
               <button

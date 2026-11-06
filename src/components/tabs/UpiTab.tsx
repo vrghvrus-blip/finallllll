@@ -9,6 +9,8 @@ import {
   PlusCircle,
   CheckCircle2,
   Shield,
+  Trash2,
+  Zap,
 } from 'lucide-react';
 import { UPIAccount } from '../../types/rswallet';
 import { PaytmLogo } from '../PaymentLogos';
@@ -21,6 +23,9 @@ interface UpiTabProps {
   onOpenHowBindUpi: () => void;
   onOpenUpiApp: (appName: string, upiId: string) => void;
   onAccountPinVerified?: (account: UPIAccount) => void;
+  onDeleteAccount?: (id: string) => void;
+  onTriggerInstantSettlement?: () => void;
+  userQuota?: number;
 }
 
 export const UpiTab: React.FC<UpiTabProps> = ({
@@ -30,6 +35,9 @@ export const UpiTab: React.FC<UpiTabProps> = ({
   onOpenHowBindUpi,
   onOpenUpiApp,
   onAccountPinVerified,
+  onDeleteAccount,
+  onTriggerInstantSettlement,
+  userQuota = 0,
 }) => {
   const [upiSubTab, setUpiSubTab] = useState<'receive' | 'send'>('receive');
   const [isAvailableOpen, setIsAvailableOpen] = useState(true);
@@ -38,7 +46,7 @@ export const UpiTab: React.FC<UpiTabProps> = ({
   // 6-Digit PIN Modal state (Screenshot match)
   const [pinModalAccount, setPinModalAccount] = useState<UPIAccount | null>(null);
   const [isPinModalOpen, setIsPinModalOpen] = useState(false);
-  const [pinActionType, setPinActionType] = useState<'sale_toggle' | 'open_upi' | 'authorize'>('authorize');
+  const [pinActionType, setPinActionType] = useState<'sale_toggle' | 'open_upi' | 'authorize' | 'delete'>('authorize');
 
   // Filter accounts
   const availableAccounts = accounts.filter(
@@ -48,6 +56,8 @@ export const UpiTab: React.FC<UpiTabProps> = ({
   const unavailableAccounts = accounts.filter(
     (acc) => acc.status !== 'Authorized' && (acc.type === 'both' || acc.type === upiSubTab)
   );
+
+  const hasOnSaleAccount = availableAccounts.some((acc) => acc.isOnSale);
 
   const handleOpenUpiWithPin = (account: UPIAccount) => {
     setPinModalAccount(account);
@@ -61,12 +71,22 @@ export const UpiTab: React.FC<UpiTabProps> = ({
     setIsPinModalOpen(true);
   };
 
+  const handleDeleteWithPin = (account: UPIAccount) => {
+    setPinModalAccount(account);
+    setPinActionType('delete');
+    setIsPinModalOpen(true);
+  };
+
   const handlePinSuccess = () => {
     if (!pinModalAccount) return;
     if (pinActionType === 'open_upi') {
       onOpenUpiApp(pinModalAccount.appName, pinModalAccount.upiId);
     } else if (pinActionType === 'sale_toggle') {
       onToggleSaleStatus(pinModalAccount.id);
+    } else if (pinActionType === 'delete') {
+      if (onDeleteAccount) {
+        onDeleteAccount(pinModalAccount.id);
+      }
     }
     if (onAccountPinVerified) {
       onAccountPinVerified(pinModalAccount);
@@ -109,6 +129,44 @@ export const UpiTab: React.FC<UpiTabProps> = ({
         </div>
         <span>Please keep your account available</span>
       </div>
+
+      {/* Dynamic Settlement Engine Status */}
+      {hasOnSaleAccount ? (
+        userQuota > 0 ? (
+          <div className="bg-emerald-50/90 border border-emerald-200 rounded-xl p-3 flex items-center justify-between text-xs font-bold text-emerald-900 shadow-2xs animate-in fade-in">
+            <div className="flex items-center gap-2.5">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+              </span>
+              <div>
+                <div className="text-emerald-950 font-black flex items-center gap-1.5">
+                  <span>Auto Settlement Engine Active</span>
+                </div>
+                <div className="text-[11px] text-emerald-700 font-medium">
+                  Dispatches orders against available Quota (₹{userQuota.toLocaleString()})
+                </div>
+              </div>
+            </div>
+            {onTriggerInstantSettlement && (
+              <button
+                type="button"
+                onClick={onTriggerInstantSettlement}
+                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-lg text-xs font-bold flex items-center gap-1 transition shadow-xs cursor-pointer"
+                title="Trigger simulated incoming payment"
+              >
+                <Zap className="w-3.5 h-3.5 fill-current" />
+                <span>Match Order</span>
+              </button>
+            )}
+          </div>
+        ) : (
+          <div className="bg-amber-50/90 border border-amber-200 rounded-xl p-3 flex items-center gap-2 text-xs font-semibold text-amber-800">
+            <div className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+            <span>Account is on sale, but Quota is 0 INR. Top up or buy Quota in Deposit tab to receive settlements.</span>
+          </div>
+        )
+      ) : null}
 
       {/* How to bind UPI? */}
       <div className="flex justify-center pt-1">
@@ -236,15 +294,26 @@ export const UpiTab: React.FC<UpiTabProps> = ({
                     <span className="text-[11px] text-zinc-400 font-medium">
                       {account.bankName || 'Direct NPCI Settlement'}
                     </span>
-                    <button
-                      type="button"
-                      onClick={() => handleOpenUpiWithPin(account)}
-                      className="px-3 py-1 bg-zinc-100 hover:bg-zinc-200 rounded-lg text-xs font-bold text-zinc-800 flex items-center gap-1 transition active:scale-95"
-                    >
-                      <Smartphone className="w-3.5 h-3.5" />
-                      <span>Open UPI</span>
-                      <ExternalLink className="w-3 h-3 text-zinc-500" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleDeleteWithPin(account)}
+                        className="p-1.5 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition active:scale-95 cursor-pointer"
+                        title="Unbind Account"
+                        aria-label="Unbind Account"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenUpiWithPin(account)}
+                        className="px-3 py-1 bg-zinc-100 hover:bg-zinc-200 rounded-lg text-xs font-bold text-zinc-800 flex items-center gap-1 transition active:scale-95 cursor-pointer"
+                      >
+                        <Smartphone className="w-3.5 h-3.5" />
+                        <span>Open UPI</span>
+                        <ExternalLink className="w-3 h-3 text-zinc-500" />
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))
@@ -292,6 +361,15 @@ export const UpiTab: React.FC<UpiTabProps> = ({
                       Status: {account.status}
                     </div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteWithPin(account)}
+                    className="p-2 text-zinc-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition active:scale-95 cursor-pointer"
+                    title="Unbind Account"
+                    aria-label="Unbind Account"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               ))
             )}

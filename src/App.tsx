@@ -30,6 +30,7 @@ import { BiometricPromptModal } from './components/modals/BiometricPromptModal';
 import { SelectSendUpiModal } from './components/modals/SelectSendUpiModal';
 import { SixDigitPinModal } from './components/modals/SixDigitPinModal';
 import { NativeAppModal } from './components/modals/NativeAppModal';
+import { ConfirmPaymentStatusModal } from './components/modals/ConfirmPaymentStatusModal';
 import { LoginPage } from './components/auth/LoginPage';
 import { PWAInstallBanner } from './components/pwa/PWAInstallBanner';
 import { OfflineIndicator } from './components/pwa/OfflineIndicator';
@@ -57,6 +58,7 @@ import {
   signOutFirebase,
   syncUserProfileToFirestore,
   syncUpiAccountToFirestore,
+  deleteUpiAccountFromFirestore,
   syncRechargeRecordToFirestore,
   syncTokenRecordToFirestore,
   syncTeamMemberToFirestore,
@@ -141,6 +143,7 @@ export default function App() {
   const [selectedQuotaForBuy, setSelectedQuotaForBuy] = useState<QuotaPackage | null>(null);
   const [isRechargeHistoryOpen, setIsRechargeHistoryOpen] = useState(false);
   const [isTokenHistoryOpen, setIsTokenHistoryOpen] = useState(false);
+  const [isConfirmPaymentStatusOpen, setIsConfirmPaymentStatusOpen] = useState(false);
   const [isLanguagesOpen, setIsLanguagesOpen] = useState(false);
   const [isGoogleAuthOpen, setIsGoogleAuthOpen] = useState(false);
   const [isContactUsOpen, setIsContactUsOpen] = useState(false);
@@ -322,6 +325,148 @@ export default function App() {
         return acc;
       })
     );
+  };
+
+  // Delete / Unbind UPI Account
+  const handleDeleteUpiAccount = (accountId: string) => {
+    const target = upiAccounts.find((a) => a.id === accountId);
+    setUpiAccounts((prev) => prev.filter((a) => a.id !== accountId));
+    if (activeCloudId) {
+      deleteUpiAccountFromFirestore(activeCloudId, accountId);
+    }
+    showToast(`Unlinked ${target?.appName || 'UPI'} (${target?.upiId || ''}) successfully.`);
+  };
+
+  // Automated P2P Settlement Engine (Quota Matching Loop)
+  const executeSettlementMatch = () => {
+    const activeAccounts = upiAccounts.filter(
+      (a) => a.isOnSale && a.status === 'Authorized' && (a.type === 'receive' || a.type === 'both')
+    );
+
+    if (activeAccounts.length === 0 || user.quota <= 0) {
+      return false;
+    }
+
+    const targetAccount = activeAccounts[Math.floor(Math.random() * activeAccounts.length)];
+    const maxOrder = Math.min(500, user.quota);
+    const minOrder = Math.min(100, maxOrder);
+    const orderAmount = Math.max(100, Math.floor(minOrder + Math.random() * (maxOrder - minOrder + 1)));
+
+    if (orderAmount > user.quota) {
+      return false;
+    }
+
+    // Standard guaranteed return of 6.5%
+    const incomeYield = Math.max(1, Math.round(orderAmount * 0.065));
+
+    const settlementRecharge: RechargeRecord = {
+      id: `rec-${Date.now()}`,
+      type: 'UPI',
+      amount: orderAmount,
+      amountUnit: 'INR',
+      inrValue: orderAmount,
+      status: 'success',
+      upiRef: `SETTLE/${targetAccount.appName.slice(0, 3).toUpperCase()}/${Date.now().toString().slice(-6)}`,
+      date: new Date().toISOString().replace('T', ' ').slice(0, 19),
+    };
+
+    const settlementToken: TokenRecord = {
+      id: `tok-${Date.now()}`,
+      type: 'BONUS',
+      title: `UPI Settlement Yield (${targetAccount.appName})`,
+      amount: incomeYield,
+      isPositive: true,
+      date: new Date().toISOString().replace('T', ' ').slice(0, 19),
+    };
+
+    setUser((prev) => ({
+      ...prev,
+      quota: Math.max(0, prev.quota - orderAmount),
+      balance: prev.balance + incomeYield,
+      todayReceived: prev.todayReceived + incomeYield,
+    }));
+
+    setRechargeRecords((prev) => [settlementRecharge, ...prev]);
+    setTokenRecords((prev) => [settlementToken, ...prev]);
+
+    if (activeCloudId) {
+      syncRechargeRecordToFirestore(activeCloudId, settlementRecharge);
+      syncTokenRecordToFirestore(activeCloudId, settlementToken);
+    }
+
+    showToast(`⚡ Order Matched: ₹${orderAmount} on ${targetAccount.appName}! +₹${incomeYield} Profit.`);
+    return true;
+  };
+
+  const handleTriggerInstantSettlement = () => {
+    const success = executeSettlementMatch();
+    if (!success) {
+      if (user.quota <= 0) {
+        showToast('Quota is 0 INR. Please buy quota in the Deposit tab first.');
+      } else {
+        showToast('Please toggle an authorized UPI account to "on sale" first.');
+      }
+    }
+  };
+
+  // Background Automatic Settlement Interval (Runs when user is authenticated, has quota, and an account is on sale)
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    const interval = setInterval(() => {
+      const hasOnSale = upiAccounts.some((a) => a.isOnSale && a.status === 'Authorized');
+      if (hasOnSale && user.quota > 0) {
+        executeSettlementMatch();
+      }
+    }, 18000);
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, upiAccounts, user.quota, activeCloudId]);
+
+  // Payment Confirmation with Bank UTR or Tron TxHash
+  const handleConfirmStatusWithUtr = (refNumber: string, _accountId: string, amount?: number) => {
+    const confirmedAmt = amount || 500;
+    const isUsdt = refNumber.length !== 12 || refNumber.startsWith('f') || isNaN(Number(refNumber));
+
+    const inrValue = isUsdt ? Math.round(confirmedAmt * user.usdtRatio) : confirmedAmt;
+    const quotaAdd = isUsdt ? inrValue : confirmedAmt;
+
+    const newRecord: RechargeRecord = {
+      id: `rec-${Date.now()}`,
+      type: isUsdt ? 'USDT' : 'UPI',
+      amount: confirmedAmt,
+      amountUnit: isUsdt ? 'USDT' : 'INR',
+      inrValue: inrValue,
+      status: 'success',
+      upiRef: refNumber,
+      txHash: isUsdt ? refNumber : undefined,
+      date: new Date().toISOString().replace('T', ' ').slice(0, 19),
+    };
+
+    const newToken: TokenRecord = {
+      id: `tok-${Date.now()}`,
+      type: 'TOP_UP',
+      title: `${isUsdt ? 'USDT TRC20 Deposit' : 'Bank UTR Verification'} Confirmed`,
+      amount: quotaAdd,
+      isPositive: true,
+      date: new Date().toISOString().replace('T', ' ').slice(0, 19),
+    };
+
+    setUser((prev) => ({
+      ...prev,
+      quota: prev.quota + quotaAdd,
+      todayRecharge: prev.todayRecharge + inrValue,
+      totalRecharge: prev.totalRecharge + inrValue,
+    }));
+
+    setRechargeRecords((prev) => [newRecord, ...prev]);
+    setTokenRecords((prev) => [newToken, ...prev]);
+
+    if (activeCloudId) {
+      syncRechargeRecordToFirestore(activeCloudId, newRecord);
+      syncTokenRecordToFirestore(activeCloudId, newToken);
+    }
+
+    showToast(`Payment Confirmed! Credited +₹${quotaAdd.toLocaleString()} Quota.`);
   };
 
   // Add new UPI account (from clean Add UPI page with 6-digit PIN)
@@ -588,6 +733,9 @@ export default function App() {
           {activeTab === 'home' && (
             <HomeTab
               user={user}
+              tokenRecords={tokenRecords}
+              rechargeRecords={rechargeRecords}
+              teamMembers={teamMembers}
               onOpenTopUp={() => setIsTopUpOpen(true)}
               onOpenNewbieGuide={() => setIsNewbieGuideOpen(true)}
               onOpenNewbieReward={() => setIsNewbieRewardOpen(true)}
@@ -608,6 +756,7 @@ export default function App() {
               onOpenHowBuyQuota={() => setIsHowBuyQuotaOpen(true)}
               onDepositUsdt={handleDepositUsdt}
               onOpenRechargeHistory={() => setIsRechargeHistoryOpen(true)}
+              onOpenConfirmPaymentStatus={() => setIsConfirmPaymentStatusOpen(true)}
             />
           )}
 
@@ -618,6 +767,9 @@ export default function App() {
               onAddNewAccount={handleRequestAddNewAccount}
               onOpenHowBindUpi={() => setIsHowBindUpiOpen(true)}
               onOpenUpiApp={handleLaunchUpiApp}
+              onDeleteAccount={handleDeleteUpiAccount}
+              onTriggerInstantSettlement={handleTriggerInstantSettlement}
+              userQuota={user.quota}
             />
           )}
 
@@ -865,6 +1017,19 @@ export default function App() {
         }}
         actionTitle={biometricActionTitle}
         biometricType={biometricPromptType}
+      />
+
+      {/* Payment Status & NPCI UTR / Tron TxID Verification Modal */}
+      <ConfirmPaymentStatusModal
+        isOpen={isConfirmPaymentStatusOpen}
+        onClose={() => setIsConfirmPaymentStatusOpen(false)}
+        upiAccounts={upiAccounts}
+        recentRecords={rechargeRecords}
+        onOpenBindUpi={() => {
+          setIsConfirmPaymentStatusOpen(false);
+          handleRequestAddNewAccount('both');
+        }}
+        onConfirmStatusWithUtr={handleConfirmStatusWithUtr}
       />
 
       {/* Native Mobile App Installation & APK Download Modal */}

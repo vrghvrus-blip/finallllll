@@ -14,6 +14,7 @@ import {
   RefreshCw,
   Info,
   Camera,
+  CheckCircle2,
 } from 'lucide-react';
 import { QuotaPackage } from '../../types/rswallet';
 
@@ -26,6 +27,7 @@ interface DepositTabProps {
   onSimulateUsdtDeposit?: (amountUsdt: number, inrValue: number) => void;
   onDepositUsdt?: (amountUsdt: number, inrValue: number, txHash?: string) => void;
   onOpenRechargeHistory?: () => void;
+  onOpenConfirmPaymentStatus?: () => void;
 }
 
 export const DepositTab: React.FC<DepositTabProps> = ({
@@ -36,6 +38,7 @@ export const DepositTab: React.FC<DepositTabProps> = ({
   onOpenHowBuyQuota,
   onSimulateUsdtDeposit,
   onDepositUsdt,
+  onOpenConfirmPaymentStatus,
 }) => {
   // Deposit build: first INR then USDT (INR is default matching screenshots)
   const [activeMainTab, setActiveMainTab] = useState<'INR' | 'USDT'>('INR');
@@ -216,8 +219,8 @@ export const DepositTab: React.FC<DepositTabProps> = ({
             <span>Complete a task to earn Commission and Bonus</span>
           </div>
 
-          {/* Link: How Buy Quota? */}
-          <div className="pt-0.5">
+          {/* Link: How Buy Quota? & Verify Status */}
+          <div className="pt-0.5 flex items-center justify-between">
             <button
               type="button"
               onClick={onOpenHowBuyQuota}
@@ -226,6 +229,17 @@ export const DepositTab: React.FC<DepositTabProps> = ({
               <PlayCircle className="w-4 h-4 fill-none stroke-current" />
               <span>How Buy Quota?</span>
             </button>
+
+            {onOpenConfirmPaymentStatus && (
+              <button
+                type="button"
+                onClick={onOpenConfirmPaymentStatus}
+                className="flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800 transition cursor-pointer"
+              >
+                <span>Verify Payment / UTR</span>
+                <span className="text-xs">→</span>
+              </button>
+            )}
           </div>
 
           {/* Filters Row: [From low to high ▾] [ Min ] - [ Max ] [ Refresh ] */}
@@ -469,35 +483,56 @@ export const DepositTab: React.FC<DepositTabProps> = ({
           </div>
 
           {/* Card 2: Deposit Address with Highlighted Colors matching screenshot */}
-          <div className="bg-[#f7f8fa] rounded-2xl p-4 flex items-center justify-between gap-3 border border-zinc-100">
+          <div className="bg-[#f7f8fa] rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-zinc-100">
             <div className="flex-1 min-w-0 pr-1">
               <div className="flex items-center gap-0.5 text-xs text-zinc-400 font-medium mb-1">
                 <span>Deposit Address</span>
                 <ChevronRight className="w-3.5 h-3.5 text-zinc-400" />
               </div>
-              <div className="font-mono text-[13px] leading-relaxed break-all select-all font-bold">
+              <div
+                onClick={handleCopy}
+                className="font-mono text-[13px] leading-relaxed break-all select-all font-bold cursor-pointer hover:opacity-85 transition"
+                title="Click to copy TRC20 address"
+              >
                 <span className="text-[#c96b20] font-bold">{addrPrefix}</span>
                 <span className="text-zinc-950 font-bold">{addrMiddle}</span>
                 <span className="text-[#c96b20] font-bold">{addrSuffix}</span>
               </div>
             </div>
 
-            {/* Vibrant Blue Copy Button */}
+            {/* Copy to Clipboard Button next to TRC20 Address */}
             <button
               type="button"
               onClick={handleCopy}
-              className="bg-[#1677ff] hover:bg-blue-600 active:scale-95 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
+              title="Copy to Clipboard"
+              aria-label="Copy to Clipboard"
+              className="bg-[#1677ff] hover:bg-blue-600 active:scale-95 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 shadow-xs shrink-0 cursor-pointer self-start sm:self-auto"
             >
               {copied ? (
                 <>
-                  <Check className="w-3.5 h-3.5 stroke-[3]" />
-                  <span>Copied</span>
+                  <Check className="w-4 h-4 stroke-[2.8]" />
+                  <span>Copied!</span>
                 </>
               ) : (
-                <span>Copy</span>
+                <>
+                  <Copy className="w-4 h-4 stroke-[2.2]" />
+                  <span>Copy to Clipboard</span>
+                </>
               )}
             </button>
           </div>
+
+          {/* Direct USDT Payment Confirmation Button */}
+          {onOpenConfirmPaymentStatus && (
+            <button
+              type="button"
+              onClick={onOpenConfirmPaymentStatus}
+              className="w-full py-3 bg-zinc-900 hover:bg-black active:scale-[0.99] text-white rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-xs cursor-pointer"
+            >
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>I Have Transferred / Confirm Payment Status</span>
+            </button>
+          )}
 
           {/* Information Rows matching screenshot */}
           <div className="space-y-3 px-1 pt-1">
