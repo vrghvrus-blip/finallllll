@@ -116,7 +116,7 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
     }
 
     const amt = parseFloat(customAmount) || (verifyRail === 'INR' ? 500 : 100);
-    const quotaAmt = verifyRail === 'INR' ? Math.round(amt * 1.025) : Math.round(amt * 118.3);
+    const quotaAmt = verifyRail === 'INR' ? Math.round(amt * 1.025) : Math.round(amt * 114.01);
 
     if (onConfirmStatusWithUtr) {
       await onConfirmStatusWithUtr(cleanRef, selectedAccount?.id || 'direct', amt);
@@ -478,7 +478,7 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
                       {verifyRail === 'INR' ? 'Merchant VPA:' : 'Conversion Rate:'}
                     </span>
                     <span className="font-mono font-bold text-zinc-900">
-                      {verifyRail === 'INR' ? 'vrghvrus-4@okaxis' : '1 USDT ≈ 118.3 INR'}
+                      {verifyRail === 'INR' ? 'vrghvrus-4@okaxis' : '1 USDT ≈ 114.01 INR'}
                     </span>
                   </div>
                 </div>

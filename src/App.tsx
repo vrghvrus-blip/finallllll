@@ -70,20 +70,18 @@ export default function App() {
   // Navigation Tab
   const [activeTab, setActiveTab] = useState<TabType>('home');
 
-  // Core User State (0 data baseline, 118.3 USDT rate)
+  // Core User State (0 data baseline, 114.01 USDT rate)
   const [user, setUser] = useState<UserProfile>(() => {
     const saved = localStorage.getItem('sharkpay_user_v3');
     if (saved) {
       try {
-        return JSON.parse(saved);
+        const parsed = JSON.parse(saved);
+        return { ...parsed, usdtRatio: 114.01 };
       } catch {
         // fallback
       }
     }
-    try {
-      localStorage.removeItem('sharkpay_user_v2');
-    } catch {}
-    return INITIAL_USER;
+    return { ...INITIAL_USER, usdtRatio: 114.01 };
   });
 
   // UPI Accounts (0 data baseline)
@@ -777,7 +775,6 @@ export default function App() {
             <TeamTab
               user={user}
               teamMembers={teamMembers}
-              onAddTeammate={handleAddTeammate}
               onShowShareModal={() => setIsShareModalOpen(true)}
             />
           )}

@@ -15,7 +15,7 @@ export const INITIAL_USER: UserProfile = {
   todayRecharge: 0,
   totalRecharge: 0,
   totalCommission: 0,
-  usdtRatio: 118.3, // USDT rate 118.3 INR as requested
+  usdtRatio: 114.01, // USDT rate 114.01 INR as requested
   inrBonusRatio: 3.5,
   inviteCode: '0edatgwpa7r5',
   inviteUrl: 'https://app-web.sharkpay-app.com/regist?code=0edatgwpa7r5',

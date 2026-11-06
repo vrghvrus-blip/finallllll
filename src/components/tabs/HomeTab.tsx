@@ -94,7 +94,7 @@ export const HomeTab: React.FC<HomeTabProps> = ({
         <div className="flex-1 pr-3">
           <div className="text-xs font-bold text-zinc-900 tracking-tight">USDT Ratio</div>
           <div className="text-base font-black text-zinc-950 mt-1">
-            1 USDT ≈ {user.usdtRatio.toFixed(1)} INR
+            1 USDT ≈ {user.usdtRatio.toFixed(2)} INR
           </div>
           <div className="text-[11px] text-zinc-400 mt-0.5 font-medium">
             Bonus ratio: {user.rewardRatio}%

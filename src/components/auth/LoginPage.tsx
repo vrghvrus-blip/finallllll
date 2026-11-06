@@ -353,6 +353,29 @@ export const LoginPage: React.FC<LoginPageProps> = ({
       };
       localStorage.setItem('sharkpay_registered_accounts', JSON.stringify(accounts));
 
+      // 4. Auto-Referral Engine: Link referred downline teammate automatically
+      try {
+        const code = regInviteCode.trim();
+        if (code) {
+          const storedTeam = localStorage.getItem('sharkpay_team_v3');
+          const existingTeam = storedTeam ? JSON.parse(storedTeam) : [];
+          const newReferralMember = {
+            id: `tm-${Date.now()}`,
+            name: `Partner ${trimmedPhone.slice(-4)}`,
+            phone: `${trimmedPhone.slice(0, 3)}****${trimmedPhone.slice(-3)}`,
+            tier: 1,
+            tradingVolume: 2000,
+            commissionEarned: 200, // 10% Tier 1 commission
+            status: 'Active',
+            joinedAt: new Date().toISOString().split('T')[0],
+          };
+          existingTeam.unshift(newReferralMember);
+          localStorage.setItem('sharkpay_team_v3', JSON.stringify(existingTeam));
+        }
+      } catch (refErr) {
+        console.warn('Auto-referral connection note:', refErr);
+      }
+
       // Successfully registered real account - log in directly
       onLoginSuccess(trimmedPhone);
     } catch (err) {

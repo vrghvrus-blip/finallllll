@@ -182,7 +182,7 @@ export async function syncUserProfileToFirestore(userId: string, profile: UserPr
         todayReceived: profile.todayReceived ?? 0,
         todayRecharge: profile.todayRecharge ?? 0,
         totalRecharge: profile.totalRecharge ?? 0,
-        usdtRatio: profile.usdtRatio ?? 118.3,
+        usdtRatio: profile.usdtRatio ?? 114.01,
         inviteCode: profile.inviteCode || '0edatgwpa7r5',
         inviteUrl: profile.inviteUrl || 'https://sharkpay.in/invite/0edatgwpa7r5',
         securityPin: profile.securityPin || '',
