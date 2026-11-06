@@ -40,9 +40,9 @@ export const PWAInstallBanner: React.FC = () => {
 
   return (
     <>
-      <div className="fixed bottom-16 sm:bottom-4 left-3 right-3 sm:left-auto sm:right-4 sm:max-w-md z-40 bg-zinc-950/95 text-white p-3.5 rounded-2xl shadow-2xl border border-zinc-800 backdrop-blur-md flex items-center justify-between gap-3 animate-in slide-in-from-bottom-3 duration-300">
+      <div className="fixed bottom-16 sm:bottom-4 left-3 right-3 sm:left-auto sm:right-4 sm:max-w-md z-40 bg-gradient-to-b from-[#fdfcf9] to-[#f7f4ee] text-zinc-900 p-3.5 rounded-2xl shadow-xl border border-[#eee6d8] backdrop-blur-md flex items-center justify-between gap-3 animate-in slide-in-from-bottom-3 duration-300">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#1961e6] to-cyan-400 p-0.5 shrink-0 flex items-center justify-center shadow-md">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#1961e6] to-cyan-400 p-0.5 shrink-0 flex items-center justify-center shadow-2xs">
             <img
               src="/pwa-192x192.png"
               alt="SharkPay 2.0"
@@ -55,12 +55,12 @@ export const PWAInstallBanner: React.FC = () => {
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-black tracking-tight text-white truncate">Install SharkPay 2.0</span>
+              <span className="text-xs font-black tracking-tight text-zinc-950 truncate">Install SharkPay 2.0</span>
               <span className="text-[9px] font-bold bg-[#1961e6] text-white px-1.5 py-0.2 rounded-full shrink-0">
                 PWA
               </span>
             </div>
-            <p className="text-[10px] text-zinc-400 font-medium truncate">
+            <p className="text-[10px] text-zinc-500 font-medium truncate">
               {isIOS ? 'Add to Home Screen for fullscreen app' : 'Install for offline access & faster loads'}
             </p>
           </div>
@@ -71,7 +71,7 @@ export const PWAInstallBanner: React.FC = () => {
             type="button"
             onClick={handleInstallClick}
             disabled={isInstalling}
-            className="px-3.5 py-2 bg-gradient-to-r from-[#1961e6] to-[#0ea5e9] text-white rounded-xl text-xs font-black tracking-wide shadow-md hover:brightness-110 active:scale-95 transition flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 py-2 bg-gradient-to-r from-[#1961e6] to-[#0ea5e9] text-white rounded-xl text-xs font-black tracking-wide shadow-2xs hover:brightness-110 active:scale-95 transition flex items-center gap-1.5 cursor-pointer"
           >
             <Download className="w-3.5 h-3.5 stroke-[2.5]" />
             <span>{isIOS ? 'Install' : 'Install App'}</span>
@@ -79,7 +79,7 @@ export const PWAInstallBanner: React.FC = () => {
           <button
             type="button"
             onClick={handleDismiss}
-            className="p-1.5 text-zinc-400 hover:text-white rounded-lg transition cursor-pointer"
+            className="p-1.5 text-zinc-400 hover:text-zinc-700 rounded-lg transition cursor-pointer"
             title="Dismiss"
           >
             <X className="w-4 h-4" />
@@ -93,7 +93,7 @@ export const PWAInstallBanner: React.FC = () => {
           <div className="bg-white text-zinc-900 rounded-3xl p-6 max-w-sm w-full space-y-4 shadow-2xl border border-zinc-100">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-10 h-10 rounded-2xl bg-zinc-900 text-white flex items-center justify-center font-black">
+                <div className="w-10 h-10 rounded-2xl bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] flex items-center justify-center font-black">
                   SP
                 </div>
                 <div>
@@ -142,7 +142,7 @@ export const PWAInstallBanner: React.FC = () => {
             <button
               type="button"
               onClick={() => setShowIOSModal(false)}
-              className="w-full py-3 bg-zinc-950 text-white font-bold text-xs rounded-xl hover:bg-zinc-800 transition active:scale-95"
+              className="w-full py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-95 text-zinc-950 font-bold text-xs rounded-xl border border-[#e2d9ca] transition shadow-2xs"
             >
               Got it
             </button>

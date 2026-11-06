@@ -14,6 +14,7 @@ import {
 import { TutorialModal } from './components/modals/TutorialModal';
 import { HowBindUpiModal, HowBuyQuotaModal } from './components/modals/HowToModals';
 import { BindUpiModal } from './components/modals/BindUpiModal';
+import { LuckyWheelModal } from './components/modals/LuckyWheelModal';
 import { OpenUpiSimulatorModal } from './components/modals/OpenUpiSimulatorModal';
 import { BuyQuotaModal } from './components/modals/BuyQuotaModal';
 import { TopUpModal } from './components/modals/TopUpModal';
@@ -130,6 +131,7 @@ export default function App() {
   const [isTopUpOpen, setIsTopUpOpen] = useState(false);
   const [isNewbieGuideOpen, setIsNewbieGuideOpen] = useState(false);
   const [isNewbieRewardOpen, setIsNewbieRewardOpen] = useState(false);
+  const [isLuckyWheelOpen, setIsLuckyWheelOpen] = useState(false);
   const [activeTutorial, setActiveTutorial] = useState<'freecharge' | 'indus' | 'phonepe' | null>(null);
   const [isHowBindUpiOpen, setIsHowBindUpiOpen] = useState(false);
   const [isHowBuyQuotaOpen, setIsHowBuyQuotaOpen] = useState(false);
@@ -737,6 +739,7 @@ export default function App() {
               onOpenTopUp={() => setIsTopUpOpen(true)}
               onOpenNewbieGuide={() => setIsNewbieGuideOpen(true)}
               onOpenNewbieReward={() => setIsNewbieRewardOpen(true)}
+              onOpenLuckyWheel={() => setIsLuckyWheelOpen(true)}
               onOpenTutorial={(type) => setActiveTutorial(type)}
               onNavigateTab={(tab) => setActiveTab(tab)}
               onOpenHistory={(type) =>
@@ -901,6 +904,12 @@ export default function App() {
         onClose={() => setIsNewbieRewardOpen(false)}
         onClaimDaily={handleClaimDailyReward}
         alreadyClaimedToday={alreadyClaimedDaily}
+      />
+
+      <LuckyWheelModal
+        isOpen={isLuckyWheelOpen}
+        onClose={() => setIsLuckyWheelOpen(false)}
+        onWinReward={(amount) => handleClaimDailyReward(amount)}
       />
 
       <TutorialModal

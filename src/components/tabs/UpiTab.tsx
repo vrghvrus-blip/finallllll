@@ -96,17 +96,30 @@ export const UpiTab: React.FC<UpiTabProps> = ({
   return (
     <div className="space-y-4 pb-28">
       {/* Title */}
-      <div className="pt-2">
-        <h1 className="text-2xl font-black text-zinc-950 tracking-tight">UPI</h1>
+      <div className="pt-1 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-zinc-950 tracking-tight">UPI Accounts</h1>
+          <p className="text-xs text-zinc-500 font-medium">Manage linked settlement UPI IDs</p>
+        </div>
+        <button
+          type="button"
+          onClick={onOpenHowBindUpi}
+          className="flex items-center gap-1 text-xs font-semibold text-zinc-700 hover:text-zinc-950 bg-zinc-100 px-3 py-1.5 rounded-lg transition cursor-pointer"
+        >
+          <PlayCircle className="w-3.5 h-3.5" />
+          <span>Guide</span>
+        </button>
       </div>
 
-      {/* Sub-tabs: Receive Payment | Send Payment */}
-      <div className="flex items-center gap-6 border-b border-zinc-100 pb-2">
+      {/* Sub-tabs Segmented Controls */}
+      <div className="flex bg-zinc-100 p-1 rounded-xl">
         <button
           type="button"
           onClick={() => setUpiSubTab('receive')}
-          className={`text-base font-bold transition-colors ${
-            upiSubTab === 'receive' ? 'text-zinc-950 font-black' : 'text-zinc-400 font-semibold'
+          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
+            upiSubTab === 'receive'
+              ? 'bg-white text-zinc-950 shadow-xs'
+              : 'text-zinc-500 hover:text-zinc-800'
           }`}
         >
           Receive Payment
@@ -114,20 +127,22 @@ export const UpiTab: React.FC<UpiTabProps> = ({
         <button
           type="button"
           onClick={() => setUpiSubTab('send')}
-          className={`text-base font-bold transition-colors ${
-            upiSubTab === 'send' ? 'text-zinc-950 font-black' : 'text-zinc-400 font-semibold'
+          className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
+            upiSubTab === 'send'
+              ? 'bg-white text-zinc-950 shadow-xs'
+              : 'text-zinc-500 hover:text-zinc-800'
           }`}
         >
           Send Payment
         </button>
       </div>
 
-      {/* Alert Banner: Please keep your account available */}
-      <div className="bg-zinc-100/90 rounded-lg p-3 flex items-center justify-center gap-2.5 text-zinc-600 text-xs font-semibold">
-        <div className="w-4 h-4 rounded-full bg-zinc-700 text-white flex items-center justify-center text-[10px] font-bold">
-          !
+      {/* Notice Banner */}
+      <div className="bg-zinc-50 border border-zinc-200/80 rounded-xl px-3.5 py-2.5 flex items-center gap-2.5 text-zinc-600 text-xs">
+        <div className="w-4 h-4 rounded-full bg-zinc-800 text-white flex items-center justify-center text-[10px] font-bold shrink-0">
+          i
         </div>
-        <span>Please keep your account available</span>
+        <span>Keep your account set to "on sale" with active quota to receive orders</span>
       </div>
 
       {/* Dynamic Settlement Engine Status */}
@@ -218,9 +233,9 @@ export const UpiTab: React.FC<UpiTabProps> = ({
                 <button
                   type="button"
                   onClick={() => onAddNewAccount(upiSubTab === 'send' ? 'send' : 'both')}
-                  className="px-4 py-2 bg-black text-white text-xs font-bold rounded-lg hover:bg-zinc-800 transition active:scale-95 inline-flex items-center gap-1.5 shadow-sm"
+                  className="px-4 py-2 bg-white text-zinc-950 border border-[#e2d9ca] text-xs font-bold rounded-lg hover:bg-[#faf7f2] transition active:scale-95 inline-flex items-center gap-1.5 shadow-2xs cursor-pointer"
                 >
-                  <PlusCircle className="w-3.5 h-3.5" />
+                  <PlusCircle className="w-3.5 h-3.5 text-zinc-700" />
                   <span>Bind Account & Set PIN</span>
                 </button>
               </div>
@@ -236,7 +251,7 @@ export const UpiTab: React.FC<UpiTabProps> = ({
                       {account.appType === 'paytm' ? (
                         <PaytmLogo className="w-12 h-6" />
                       ) : (
-                        <div className="w-9 h-9 rounded-lg bg-zinc-900 text-white font-black flex items-center justify-center text-xs shadow-xs">
+                        <div className="w-9 h-9 rounded-lg bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] font-black flex items-center justify-center text-xs shadow-2xs">
                           {account.appName.slice(0, 2).toUpperCase()}
                         </div>
                       )}
@@ -390,13 +405,13 @@ export const UpiTab: React.FC<UpiTabProps> = ({
           </span>
         </div>
 
-        {/* Add new account button */}
+        {/* Add new account button (Milk Colour Light UI) */}
         <button
           type="button"
           onClick={() => onAddNewAccount(upiSubTab === 'send' ? 'send' : 'both')}
-          className="w-full py-3.5 bg-black text-white font-bold text-base rounded-xl hover:bg-zinc-800 active:scale-95 transition shadow-sm text-center"
+          className="w-full py-3.5 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] text-zinc-950 border border-[#e2d9ca] font-bold text-base rounded-2xl hover:bg-[#eee8dc] active:scale-98 transition shadow-xs text-center cursor-pointer"
         >
-          Add new account
+          + Add new account
         </button>
       </div>
 

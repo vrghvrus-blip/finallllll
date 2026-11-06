@@ -49,8 +49,8 @@ export const RechargeHistoryModal: React.FC<RechargeHistoryModalProps> = ({
               onClick={() => setFilter(tab)}
               className={`px-3 py-1 rounded-full text-xs font-bold capitalize transition ${
                 filter === tab
-                  ? 'bg-black text-white'
-                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
+                  ? 'bg-[#f4efe6] text-zinc-950 border border-[#e2d9ca] shadow-2xs'
+                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200 border border-transparent'
               }`}
             >
               {tab}

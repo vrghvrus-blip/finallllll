@@ -1,6 +1,6 @@
 {
   "name": "SharkPay2.0",
-  "description": "Imported from GitHub: vrghvrus-blip/Sharkpay",
+  "description": "SharkPay 2.0 - Native UPI & USDT settlement app with real-time quota orders, multi-tier team commissions, and instant account authorization.",
   "requestFramePermissions": [],
   "majorCapabilities": [
     "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"

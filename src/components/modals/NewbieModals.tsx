@@ -46,7 +46,7 @@ export const NewbieGuideModal: React.FC<NewbieGuideModalProps> = ({
 
           <div className="space-y-3">
             <div className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-black text-white font-bold flex items-center justify-center flex-shrink-0 text-xs">
+              <span className="w-6 h-6 rounded-full bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] font-bold flex items-center justify-center flex-shrink-0 text-xs">
                 1
               </span>
               <div>
@@ -60,7 +60,7 @@ export const NewbieGuideModal: React.FC<NewbieGuideModalProps> = ({
             </div>
 
             <div className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-black text-white font-bold flex items-center justify-center flex-shrink-0 text-xs">
+              <span className="w-6 h-6 rounded-full bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] font-bold flex items-center justify-center flex-shrink-0 text-xs">
                 2
               </span>
               <div>
@@ -74,7 +74,7 @@ export const NewbieGuideModal: React.FC<NewbieGuideModalProps> = ({
             </div>
 
             <div className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-black text-white font-bold flex items-center justify-center flex-shrink-0 text-xs">
+              <span className="w-6 h-6 rounded-full bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] font-bold flex items-center justify-center flex-shrink-0 text-xs">
                 3
               </span>
               <div>
@@ -88,7 +88,7 @@ export const NewbieGuideModal: React.FC<NewbieGuideModalProps> = ({
             </div>
 
             <div className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-black text-white font-bold flex items-center justify-center flex-shrink-0 text-xs">
+              <span className="w-6 h-6 rounded-full bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] font-bold flex items-center justify-center flex-shrink-0 text-xs">
                 4
               </span>
               <div>
@@ -180,9 +180,9 @@ export const NewbieRewardModal: React.FC<NewbieRewardModalProps> = ({
           </div>
 
           {/* Daily Check-in Card */}
-          <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 flex items-center justify-between">
+          <div className="bg-[#fdfcf9] border border-[#eee6d8] rounded-xl p-4 flex items-center justify-between shadow-2xs">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-black text-white font-black text-sm flex items-center justify-center shadow-sm">
+              <div className="w-10 h-10 rounded-full bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] font-black text-sm flex items-center justify-center shadow-2xs">
                 ₹5
               </div>
               <div>
@@ -199,7 +199,7 @@ export const NewbieRewardModal: React.FC<NewbieRewardModalProps> = ({
               <button
                 type="button"
                 onClick={handleClaim}
-                className="px-4 py-1.5 bg-black text-white text-xs font-bold rounded-lg hover:bg-zinc-800 active:scale-95 transition shadow-sm"
+                className="px-4 py-1.5 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-95 text-zinc-950 text-xs font-bold rounded-lg border border-[#e2d9ca] transition shadow-2xs"
               >
                 Claim ₹5
               </button>
@@ -207,7 +207,7 @@ export const NewbieRewardModal: React.FC<NewbieRewardModalProps> = ({
           </div>
 
           {/* Task 1 Progress */}
-          <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-4 space-y-2">
+          <div className="bg-[#fdfcf9] border border-[#eee6d8] rounded-xl p-4 space-y-2 shadow-2xs">
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-zinc-900">Newbie Recharge Task (1/1)</span>
               <span className="font-semibold text-emerald-600">+₹5 Bonus</span>
@@ -223,7 +223,7 @@ export const NewbieRewardModal: React.FC<NewbieRewardModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-3 bg-black text-white font-bold text-sm rounded-xl hover:bg-zinc-800 transition"
+            className="w-full py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-[0.99] text-zinc-950 font-bold text-sm rounded-xl border border-[#e2d9ca] transition shadow-2xs"
           >
             Got it
           </button>

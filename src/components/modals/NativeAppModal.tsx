@@ -231,13 +231,13 @@ export const NativeAppModal: React.FC<NativeAppModalProps> = ({
           {/* iOS Tab */}
           {activeTab === 'ios' && (
             <div className="space-y-4">
-              <div className="bg-zinc-900 text-white p-4 rounded-2xl space-y-2.5">
-                <div className="flex items-center gap-2 text-xs font-bold text-zinc-400 uppercase tracking-wider">
-                  <Smartphone className="w-4 h-4 text-teal-400" />
+              <div className="bg-gradient-to-b from-[#fdfcf9] to-[#f7f4ee] border border-[#eee6d8] text-zinc-900 p-4 rounded-2xl space-y-2.5 shadow-2xs">
+                <div className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-wider">
+                  <Smartphone className="w-4 h-4 text-emerald-600" />
                   <span>iOS Safari Native Setup</span>
                 </div>
-                <h4 className="text-base font-extrabold">Add RsWallet to iPhone / iPad</h4>
-                <p className="text-xs text-zinc-300 leading-relaxed">
+                <h4 className="text-base font-extrabold text-zinc-950">Add RsWallet to iPhone / iPad</h4>
+                <p className="text-xs text-zinc-600 leading-relaxed">
                   Apple requires installing via Safari's native share menu. It creates a dedicated home screen app.
                 </p>
               </div>
@@ -354,7 +354,7 @@ export const NativeAppModal: React.FC<NativeAppModalProps> = ({
             <button
               type="button"
               onClick={handleInstallClick}
-              className="flex-1 py-3 bg-black hover:bg-zinc-900 text-white font-bold text-xs rounded-xl transition shadow-sm"
+              className="flex-1 py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-95 text-zinc-950 font-bold text-xs rounded-xl border border-[#e2d9ca] transition shadow-2xs"
             >
               Install App
             </button>

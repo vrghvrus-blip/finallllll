@@ -148,75 +148,74 @@ export const DepositTab: React.FC<DepositTabProps> = ({
     <div className="min-h-full pb-28">
       {/* Toast Notification */}
       {toastText && (
-        <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-black/90 text-white text-xs font-semibold px-4 py-2 rounded-full shadow-lg border border-white/10 animate-in fade-in slide-in-from-top-2">
+        <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 bg-[#fdfcf9] text-zinc-950 text-xs font-bold px-4 py-2 rounded-full shadow-md border border-[#e2d9ca] animate-in fade-in slide-in-from-top-2">
           {toastText}
         </div>
       )}
 
-      {/* ================= TOP TABS: FIRST INR THEN USDT (MATCHING USER REQUEST & SCREENSHOTS) ================= */}
-      <div className="pt-2 pb-2 px-1">
-        <div className="flex items-center gap-7">
+      {/* Segmented Main Tabs */}
+      <div className="pt-1 pb-1">
+        <div className="flex bg-zinc-100 p-1 rounded-xl">
           <button
             type="button"
             onClick={() => setActiveMainTab('INR')}
-            className={`text-2xl font-black tracking-tight transition-colors cursor-pointer ${
+            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
               activeMainTab === 'INR'
-                ? 'text-zinc-950 font-black'
-                : 'text-zinc-300 font-bold hover:text-zinc-500'
+                ? 'bg-white text-zinc-950 shadow-xs'
+                : 'text-zinc-500 hover:text-zinc-800'
             }`}
           >
-            INR
+            INR Quota Orders
           </button>
           <button
             type="button"
             onClick={() => setActiveMainTab('USDT')}
-            className={`text-2xl font-black tracking-tight transition-colors cursor-pointer ${
+            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
               activeMainTab === 'USDT'
-                ? 'text-zinc-950 font-black'
-                : 'text-zinc-300 font-bold hover:text-zinc-500'
+                ? 'bg-white text-zinc-950 shadow-xs'
+                : 'text-zinc-500 hover:text-zinc-800'
             }`}
           >
-            USDT
+            USDT (TRC20)
           </button>
         </div>
       </div>
 
-      {/* ================= VIEW 1: INR TAB (MATCHING Screenshot_20261103_010924 to 010937) ================= */}
+      {/* ================= VIEW 1: INR TAB ================= */}
       {activeMainTab === 'INR' && (
         <div className="space-y-3.5 pt-1">
-          {/* Subtabs: Task | VIP */}
-          <div className="flex items-center gap-7 border-b border-zinc-100 pb-2">
+          {/* Subtabs: Standard Tasks | VIP Tiers */}
+          <div className="flex items-center gap-6 border-b border-zinc-100 pb-2">
             <button
               type="button"
               onClick={() => setActiveSubTab('task')}
-              className={`text-base font-bold transition-colors cursor-pointer ${
+              className={`text-sm font-bold transition-colors cursor-pointer ${
                 activeSubTab === 'task'
-                  ? 'text-zinc-950 font-black'
+                  ? 'text-zinc-950 font-black border-b-2 border-zinc-950 pb-1 -mb-2'
                   : 'text-zinc-400 font-semibold hover:text-zinc-600'
               }`}
             >
-              Task
+              Standard Orders
             </button>
             <button
               type="button"
               onClick={() => setActiveSubTab('vip')}
-              className={`text-base font-bold transition-colors cursor-pointer ${
+              className={`text-sm font-bold transition-colors cursor-pointer ${
                 activeSubTab === 'vip'
-                  ? 'text-zinc-950 font-black'
+                  ? 'text-zinc-950 font-black border-b-2 border-zinc-950 pb-1 -mb-2'
                   : 'text-zinc-400 font-semibold hover:text-zinc-600'
               }`}
             >
-              VIP
+              VIP Quotas
             </button>
           </div>
 
-          {/* Purple Notification Banner: Complete a task to earn Commission and Bonus */}
-          <div className="bg-[#ede9fe]/70 border border-purple-100/60 rounded-xl p-3 flex items-center justify-center gap-2 text-zinc-800 text-xs font-bold shadow-2xs">
-            {/* Yellow star/coin badge matching screenshot */}
-            <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-300 text-amber-900 flex items-center justify-center text-xs font-black shadow-xs shrink-0">
-              ★
-            </div>
-            <span>Complete a task to earn Commission and Bonus</span>
+          {/* Clean Info Banner */}
+          <div className="bg-zinc-50 border border-zinc-200/80 rounded-xl p-3 flex items-center justify-between text-xs text-zinc-700">
+            <span className="font-medium">Complete quota orders to earn instant settlement yield</span>
+            <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
+              6.5% Max
+            </span>
           </div>
 
           {/* Link: How Buy Quota? & Verify Status */}
@@ -280,7 +279,7 @@ export const DepositTab: React.FC<DepositTabProps> = ({
             <button
               type="button"
               onClick={handleRefresh}
-              className="bg-black text-white text-xs font-bold px-3.5 py-2 rounded-lg hover:bg-zinc-800 active:scale-95 transition flex items-center gap-1 cursor-pointer shadow-2xs"
+              className="bg-white hover:bg-[#faf7f2] text-zinc-900 border border-[#e2d9ca] text-xs font-bold px-3.5 py-2 rounded-lg active:scale-95 transition flex items-center gap-1 cursor-pointer shadow-2xs"
             >
               <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
@@ -290,7 +289,7 @@ export const DepositTab: React.FC<DepositTabProps> = ({
           {/* Quota Packages List matching Screenshots */}
           <div className="space-y-3 pt-2">
             {filteredPackages.length === 0 ? (
-              <div className="shiny-glass-card rounded-2xl p-8 text-center border border-dashed border-zinc-200 text-xs text-zinc-400 space-y-2">
+              <div className="bg-[#fdfbf7] rounded-2xl p-8 text-center border border-dashed border-[#e2d9ca] text-xs text-zinc-400 space-y-2">
                 <p className="font-semibold text-zinc-600">No Quota orders in this range</p>
                 <p>Try clearing Min/Max or tap Refresh</p>
                 <button
@@ -299,7 +298,7 @@ export const DepositTab: React.FC<DepositTabProps> = ({
                     setMinVal('');
                     setMaxVal('');
                   }}
-                  className="px-3.5 py-1.5 bg-zinc-100 text-zinc-800 rounded-lg text-xs font-bold hover:bg-zinc-200 active:scale-95 transition cursor-pointer"
+                  className="px-3.5 py-1.5 bg-white border border-[#e2d9ca] text-zinc-800 rounded-lg text-xs font-bold hover:bg-[#faf7f2] active:scale-95 transition cursor-pointer"
                 >
                   Clear Filters
                 </button>
@@ -308,38 +307,38 @@ export const DepositTab: React.FC<DepositTabProps> = ({
               filteredPackages.map((pkg) => (
                 <div
                   key={pkg.id}
-                  className="shiny-glass-card rounded-2xl p-4 border border-zinc-200/80 shadow-xs flex items-center justify-between hover:border-zinc-300 transition-all duration-200"
+                  className="bg-white rounded-2xl p-4 border border-zinc-200/80 shadow-2xs flex items-center justify-between hover:border-zinc-300 transition-all duration-150"
                 >
                   <div>
                     {/* Amount title */}
-                    <h3 className="text-base sm:text-lg font-black text-zinc-950 tracking-tight">
-                      {pkg.amount} INR
+                    <h3 className="text-base sm:text-lg font-bold text-zinc-950 tracking-tight tabular-nums">
+                      ₹{pkg.amount.toLocaleString('en-IN')} INR
                     </h3>
 
-                    {/* Income & Quota columns matching screenshots */}
-                    <div className="flex items-center gap-8 mt-1 text-xs">
+                    {/* Income & Quota columns */}
+                    <div className="flex items-center gap-7 mt-1.5 text-xs">
                       <div>
-                        <span className="text-zinc-400 font-medium text-[11px] uppercase tracking-wider">Income</span>
-                        <div className="font-bold text-zinc-900 text-xs mt-0.5">
-                          {pkg.income} ({pkg.incomePercent}%)
+                        <span className="text-zinc-400 font-medium text-[11px]">Expected Yield</span>
+                        <div className="font-semibold text-zinc-900 text-xs mt-0.5 tabular-nums">
+                          +₹{pkg.income} ({pkg.incomePercent}%)
                         </div>
                       </div>
                       <div>
-                        <span className="text-zinc-400 font-medium text-[11px] uppercase tracking-wider">Quota</span>
-                        <div className="font-bold text-teal-600 text-xs mt-0.5">
-                          +{pkg.quota}
+                        <span className="text-zinc-400 font-medium text-[11px]">Quota Added</span>
+                        <div className="font-semibold text-emerald-600 text-xs mt-0.5 tabular-nums">
+                          +{pkg.quota} INR
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Buy Button with shiny specular sheen */}
+                  {/* Clean Milk Colour Buy Button */}
                   <button
                     type="button"
                     onClick={() => onBuyQuota(pkg)}
-                    className="shiny-specular-btn bg-gradient-to-r from-zinc-900 via-black to-zinc-950 text-white font-extrabold text-xs px-6 py-2.5 rounded-xl hover:brightness-110 active:scale-95 transition shadow-sm cursor-pointer"
+                    className="bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] text-zinc-950 border border-[#e2d9ca] font-bold text-xs px-5 py-2.5 rounded-xl hover:bg-[#eee8dc] active:scale-95 transition shadow-2xs cursor-pointer"
                   >
-                    Buy
+                    Buy Order
                   </button>
                 </div>
               ))
@@ -527,9 +526,9 @@ export const DepositTab: React.FC<DepositTabProps> = ({
             <button
               type="button"
               onClick={onOpenConfirmPaymentStatus}
-              className="w-full py-3 bg-zinc-900 hover:bg-black active:scale-[0.99] text-white rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-xs cursor-pointer"
+              className="w-full py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-[0.99] text-zinc-950 border border-[#e2d9ca] rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition shadow-2xs cursor-pointer"
             >
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
               <span>I Have Transferred / Confirm Payment Status</span>
             </button>
           )}
@@ -710,7 +709,7 @@ export const DepositTab: React.FC<DepositTabProps> = ({
             <button
               type="button"
               onClick={() => setShowHelpModal(false)}
-              className="w-full py-3 bg-zinc-900 text-white font-bold text-xs rounded-xl hover:bg-black transition"
+              className="w-full py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-[0.99] text-zinc-950 font-bold text-xs rounded-xl border border-[#e2d9ca] transition shadow-2xs"
             >
               Understood
             </button>

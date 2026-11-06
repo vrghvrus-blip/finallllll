@@ -22,6 +22,8 @@ import {
   ShieldCheck,
   Zap,
   ArrowUpRight,
+  ChevronDown,
+  ChevronUp,
 } from 'lucide-react';
 import { UserProfile, TokenRecord, RechargeRecord, TeamMember } from '../../types/rswallet';
 
@@ -56,6 +58,7 @@ export const HomeAnalytics: React.FC<HomeAnalyticsProps> = ({
   onNavigateTeam,
 }) => {
   const [selectedTab, setSelectedTab] = useState<CompanyMetricTab>('spent');
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Exact 7-day Company Spent summing to 64.1M:
   // 7.8M + 8.4M + 9.2M + 8.9M + 9.7M + 10.3M + 9.8M = 64.1M INR
@@ -117,13 +120,13 @@ export const HomeAnalytics: React.FC<HomeAnalyticsProps> = ({
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-zinc-950/95 backdrop-blur-md text-white px-3.5 py-2.5 rounded-xl border border-zinc-800 shadow-2xl text-xs space-y-1.5 min-w-[190px]">
-          <div className="font-bold text-zinc-300 pb-1 border-b border-zinc-800 flex items-center justify-between">
+        <div className="bg-[#fdfcf9] text-zinc-900 px-3.5 py-2.5 rounded-xl border border-[#eee6d8] shadow-lg text-xs space-y-1.5 min-w-[190px]">
+          <div className="font-bold text-zinc-800 pb-1 border-b border-[#eee6d8] flex items-center justify-between">
             <span className="flex items-center gap-1.5">
-              <Building2 className="w-3.5 h-3.5 text-blue-400" />
+              <Building2 className="w-3.5 h-3.5 text-blue-600" />
               {label}
             </span>
-            <span className="text-[10px] text-emerald-400 font-mono font-bold">Network Verified</span>
+            <span className="text-[10px] text-emerald-700 font-mono font-bold">Network Verified</span>
           </div>
 
           {payload.map((entry: any, index: number) => {
@@ -163,115 +166,43 @@ export const HomeAnalytics: React.FC<HomeAnalyticsProps> = ({
   };
 
   return (
-    <div className="bg-white rounded-[24px] border border-zinc-100 shadow-[0_4px_20px_rgba(0,0,0,0.04)] p-4.5 space-y-4">
-      {/* Company Header with Verified Network Badge */}
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-sm ring-2 ring-blue-500/20">
-            <Building2 className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <h3 className="text-base font-black text-zinc-950 tracking-tight">Company Details & Analysis</h3>
-              <span className="inline-flex items-center gap-0.5 text-[9px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200/80 px-1.5 py-0.5 rounded-md">
-                <CheckCircle2 className="w-2.5 h-2.5" /> Live
-              </span>
-            </div>
-            <p className="text-[11px] text-zinc-400 font-medium">SharkPay 2.0 Global Settlement Rail</p>
-          </div>
+    <div className="bg-white rounded-2xl border border-zinc-200/80 shadow-2xs p-4 space-y-3.5">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="text-sm font-bold text-zinc-950">Settlement Network Activity</h3>
+          <p className="text-[11px] text-zinc-500">₹64.1M settled in the last 7 days</p>
         </div>
+        <button
+          type="button"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="flex items-center gap-1 px-3 py-1 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 text-xs font-semibold rounded-lg transition cursor-pointer"
+        >
+          <span>{isExpanded ? 'Hide Chart' : 'View Chart'}</span>
+          {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+        </button>
+      </div>
 
-        <div className="flex items-center gap-1 bg-zinc-100/90 text-zinc-700 px-2.5 py-1 rounded-lg text-[11px] font-bold border border-zinc-200/70 shadow-2xs">
-          <Calendar className="w-3 h-3 text-zinc-500" />
-          <span>7 Days Window</span>
+      {/* 3 Compact KPI Summary Cards */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="bg-zinc-50 rounded-xl p-2.5 border border-zinc-100">
+          <span className="text-[10px] font-medium text-zinc-400">7D Volume</span>
+          <div className="text-sm font-bold text-zinc-950 mt-0.5 tabular-nums">₹64.1M</div>
+        </div>
+        <div className="bg-zinc-50 rounded-xl p-2.5 border border-zinc-100">
+          <span className="text-[10px] font-medium text-zinc-400">Yield Paid</span>
+          <div className="text-sm font-bold text-emerald-600 mt-0.5 tabular-nums">₹4.16M</div>
+        </div>
+        <div className="bg-zinc-50 rounded-xl p-2.5 border border-zinc-100">
+          <span className="text-[10px] font-medium text-zinc-400">Settlements</span>
+          <div className="text-sm font-bold text-zinc-950 mt-0.5 tabular-nums">52,480</div>
         </div>
       </div>
 
-      {/* Hero Banner: 7 Days 64.1M Spent */}
-      <div className="rounded-[20px] bg-gradient-to-br from-[#0a0d14] via-[#0f1422] to-[#121c33] text-white p-4.5 shadow-md relative overflow-hidden">
-        {/* Subtle background glow */}
-        <div className="absolute -top-12 -right-12 w-36 h-36 bg-blue-500/20 rounded-full blur-2xl pointer-events-none"></div>
-        <div className="absolute -bottom-8 -left-8 w-28 h-28 bg-emerald-500/15 rounded-full blur-xl pointer-events-none"></div>
-
-        <div className="relative z-10 flex items-center justify-between">
-          <div>
-            <div className="flex items-center gap-1.5 text-xs font-bold text-zinc-400 uppercase tracking-wider">
-              <span>7 Days Company Spent</span>
-              <span className="text-[10px] bg-blue-500/20 text-blue-300 px-1.5 py-0.2 rounded font-mono">
-                +18.4%
-              </span>
-            </div>
-            <div className="text-3xl font-black text-white tracking-tight mt-1 flex items-baseline gap-1.5">
-              <span>₹{companyTotals.totalSpentMillions}M</span>
-              <span className="text-xs font-semibold text-zinc-400 tracking-normal">INR Spent / Volume</span>
-            </div>
-            <div className="text-[11px] text-zinc-400 mt-1 flex items-center gap-3">
-              <span className="flex items-center gap-1 text-emerald-400 font-semibold">
-                <Zap className="w-3 h-3" /> 6.5% Yield Rate
-              </span>
-              <span>•</span>
-              <span className="text-zinc-300 font-medium">₹{(companyTotals.totalSpent / 7 / 1000000).toFixed(1)}M Daily Avg</span>
-            </div>
-          </div>
-
-          <div className="text-right">
-            <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md border border-white/15 flex items-center justify-center text-emerald-400 shadow-inner ml-auto">
-              <TrendingUp className="w-6 h-6" />
-            </div>
-            <span className="text-[10px] text-zinc-400 block mt-1.5 font-bold uppercase tracking-wide">
-              {companyTotals.successRate} Rail
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* 3 Core Company KPI Highlight Cards */}
-      <div className="grid grid-cols-3 gap-2 pt-0.5">
-        {/* Metric 1: Total Spent */}
-        <div className="bg-zinc-50/90 rounded-2xl p-2.5 border border-zinc-100 flex flex-col justify-between">
-          <span className="text-[10px] font-bold text-zinc-500 flex items-center gap-1">
-            <DollarSign className="w-3 h-3 text-blue-600" />
-            7D Spent
-          </span>
-          <div className="mt-1">
-            <span className="text-sm font-black text-zinc-950 tracking-tight tabular-nums">
-              ₹64.1M
-            </span>
-            <div className="text-[9px] text-blue-600 font-bold mt-0.5">₹64,100,000</div>
-          </div>
-        </div>
-
-        {/* Metric 2: Yield Paid to Network */}
-        <div className="bg-zinc-50/90 rounded-2xl p-2.5 border border-zinc-100 flex flex-col justify-between">
-          <span className="text-[10px] font-bold text-zinc-500 flex items-center gap-1">
-            <TrendingUp className="w-3 h-3 text-emerald-600" />
-            Yield Paid
-          </span>
-          <div className="mt-1">
-            <span className="text-sm font-black text-zinc-950 tracking-tight tabular-nums">
-              ₹{companyTotals.totalYieldMillions}M
-            </span>
-            <div className="text-[9px] text-emerald-600 font-bold mt-0.5">+₹4.16M Paid</div>
-          </div>
-        </div>
-
-        {/* Metric 3: Total Settlements */}
-        <div className="bg-zinc-50/90 rounded-2xl p-2.5 border border-zinc-100 flex flex-col justify-between">
-          <span className="text-[10px] font-bold text-zinc-500 flex items-center gap-1">
-            <Activity className="w-3 h-3 text-purple-600" />
-            Settlements
-          </span>
-          <div className="mt-1">
-            <span className="text-sm font-black text-zinc-950 tracking-tight tabular-nums">
-              52,480
-            </span>
-            <div className="text-[9px] text-purple-600 font-bold mt-0.5">12.8k Nodes</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tab Filter Controls */}
-      <div className="flex items-center gap-1.5 p-1 bg-zinc-100/80 rounded-xl border border-zinc-200/60 overflow-x-auto no-scrollbar">
+      {isExpanded && (
+        <div className="space-y-3 pt-2 border-t border-zinc-100 animate-in fade-in duration-200">
+          {/* Tab Filter Controls */}
+          <div className="flex items-center gap-1.5 p-1 bg-zinc-100/80 rounded-xl border border-zinc-200/60 overflow-x-auto no-scrollbar">
         <button
           type="button"
           onClick={() => setSelectedTab('spent')}
@@ -460,6 +391,8 @@ export const HomeAnalytics: React.FC<HomeAnalyticsProps> = ({
           </ResponsiveContainer>
         )}
       </div>
+    </div>
+  )}
 
       {/* Network Liquidity Proof & User Node Status */}
       <div className="bg-zinc-50/80 rounded-2xl p-3 border border-zinc-100 flex items-center justify-between text-xs">

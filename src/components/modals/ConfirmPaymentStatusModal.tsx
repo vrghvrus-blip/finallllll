@@ -154,8 +154,8 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
         {/* Header */}
         <div className="px-5 py-4 border-b border-zinc-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-md z-10">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-black text-white flex items-center justify-center">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <div className="w-8 h-8 rounded-xl bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] flex items-center justify-center">
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
             </div>
             <div>
               <h3 className="text-base font-black text-zinc-950 tracking-tight">Confirm Payment Status</h3>
@@ -185,7 +185,7 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
           >
             Verify UTR Status
             {activeTab === 'verify' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black rounded-full" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-900 rounded-full" />
             )}
           </button>
           <button
@@ -197,7 +197,7 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
           >
             Bidding Order History ({quotaRecords.length})
             {activeTab === 'orders' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-black rounded-full" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-zinc-900 rounded-full" />
             )}
           </button>
         </div>
@@ -262,7 +262,7 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
                   <button
                     type="button"
                     onClick={onClose}
-                    className="flex-1 py-3 bg-black hover:bg-zinc-800 text-white font-bold rounded-xl active:scale-95 transition shadow-sm"
+                    className="flex-1 py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] text-zinc-950 font-bold rounded-xl border border-[#e2d9ca] active:scale-95 transition shadow-2xs"
                   >
                     Done
                   </button>
@@ -327,9 +327,9 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
                         <button
                           type="button"
                           onClick={onOpenBindUpi}
-                          className="px-4 py-2 bg-black text-white text-xs font-bold rounded-lg hover:bg-zinc-800 active:scale-95 transition inline-flex items-center gap-1.5 cursor-pointer"
+                          className="px-4 py-2 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] text-zinc-950 text-xs font-bold rounded-lg border border-[#e2d9ca] active:scale-95 transition shadow-2xs inline-flex items-center gap-1.5 cursor-pointer"
                         >
-                          <Plus className="w-3.5 h-3.5" />
+                          <Plus className="w-3.5 h-3.5 text-zinc-600" />
                           <span>Bind UPI Account Now</span>
                         </button>
                       </div>
@@ -345,8 +345,8 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
                                 onClick={() => setSelectedAccountId(account.id)}
                                 className={`w-full p-3 rounded-xl border text-left flex items-center justify-between transition cursor-pointer active:scale-[0.99] ${
                                   isSelected
-                                    ? 'border-black bg-zinc-950 text-white shadow-xs'
-                                    : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-900'
+                                    ? 'border-[#c9bea9] bg-[#f4efe6] text-zinc-950 shadow-2xs'
+                                    : 'border-zinc-200 bg-white hover:bg-[#faf7f2] text-zinc-800'
                                 }`}
                               >
                                 <div className="flex items-center gap-3">
@@ -356,7 +356,7 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
                                     </div>
                                   ) : (
                                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-[11px] font-black ${
-                                      isSelected ? 'bg-white text-black' : 'bg-zinc-900 text-white'
+                                      isSelected ? 'bg-emerald-600 text-white' : 'bg-[#e2d9ca] text-zinc-800'
                                     }`}>
                                       {account.appName.slice(0, 2).toUpperCase()}
                                     </div>
@@ -365,7 +365,7 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
                                     <div className="text-xs font-bold leading-tight">
                                       {account.title}
                                     </div>
-                                    <div className={`text-[11px] font-mono mt-0.5 ${isSelected ? 'text-zinc-300' : 'text-zinc-500'}`}>
+                                    <div className={`text-[11px] font-mono mt-0.5 ${isSelected ? 'text-zinc-600' : 'text-zinc-500'}`}>
                                       {account.upiId}
                                     </div>
                                   </div>
@@ -373,12 +373,12 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
 
                                 <div className="flex items-center gap-2">
                                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                                    isSelected ? 'bg-emerald-400/20 text-emerald-300' : 'bg-emerald-50 text-emerald-700'
+                                    isSelected ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-emerald-50 text-emerald-700'
                                   }`}>
                                     Authorized
                                   </span>
                                   {isSelected ? (
-                                    <div className="w-5 h-5 rounded-full bg-white text-zinc-950 flex items-center justify-center">
+                                    <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center">
                                       <Check className="w-3.5 h-3.5 stroke-[3]" />
                                     </div>
                                   ) : (
@@ -414,8 +414,8 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
                         onClick={() => setCustomAmount(amt.toString())}
                         className={`flex-1 py-1.5 rounded-lg text-xs font-bold transition cursor-pointer ${
                           customAmount === amt.toString()
-                            ? 'bg-black text-white'
-                            : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                            ? 'bg-[#f4efe6] text-zinc-950 border border-[#e2d9ca] shadow-2xs font-bold'
+                            : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 border border-transparent'
                         }`}
                       >
                         {verifyRail === 'INR' ? `₹${amt}` : `${amt} ₮`}
@@ -427,7 +427,7 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
                     value={customAmount}
                     onChange={(e) => setCustomAmount(e.target.value)}
                     placeholder={`Enter amount in ${verifyRail}`}
-                    className="w-full bg-[#f8f9fa] border border-zinc-200 rounded-xl p-3 text-xs font-bold text-zinc-900 focus:outline-none focus:border-black"
+                    className="w-full bg-[#f8f9fa] border border-zinc-200 rounded-xl p-3 text-xs font-bold text-zinc-900 focus:outline-none focus:border-[#c9bea9]"
                   />
                 </div>
 
@@ -459,7 +459,7 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
                         ? 'Enter 12-digit UTR from your UPI payment'
                         : 'Enter TRC20 Transaction Hash (TxID)'
                     }
-                    className="w-full bg-[#f8f9fa] border border-zinc-200 rounded-xl p-3 text-xs font-mono font-bold tracking-wider text-zinc-900 placeholder:font-normal placeholder:tracking-normal focus:outline-none focus:border-black"
+                    className="w-full bg-[#f8f9fa] border border-zinc-200 rounded-xl p-3 text-xs font-mono font-bold tracking-wider text-zinc-900 placeholder:font-normal placeholder:tracking-normal focus:outline-none focus:border-[#c9bea9]"
                   />
                 </div>
 
@@ -493,18 +493,18 @@ export const ConfirmPaymentStatusModal: React.FC<ConfirmPaymentStatusModalProps>
 
                 {/* Verification in progress display */}
                 {isVerifying ? (
-                  <div className="p-4 bg-zinc-900 text-white rounded-xl space-y-2 text-center animate-pulse">
-                    <RefreshCw className="w-5 h-5 text-cyan-400 animate-spin mx-auto" />
-                    <p className="text-xs font-bold text-cyan-300">{verifyStep}</p>
-                    <p className="text-[10px] text-zinc-400">Communicating with NPCI settlement gateway...</p>
+                  <div className="p-4 bg-gradient-to-b from-[#fdfcf9] to-[#f7f4ee] border border-[#eee6d8] text-zinc-900 rounded-xl space-y-2 text-center animate-pulse shadow-2xs">
+                    <RefreshCw className="w-5 h-5 text-emerald-600 animate-spin mx-auto" />
+                    <p className="text-xs font-bold text-zinc-900">{verifyStep}</p>
+                    <p className="text-[10px] text-zinc-500">Communicating with NPCI settlement gateway...</p>
                   </div>
                 ) : (
                   <button
                     type="button"
                     onClick={handleRunVerification}
-                    className="w-full py-3.5 bg-black hover:bg-zinc-800 text-white font-bold text-sm rounded-xl transition active:scale-98 shadow-sm flex items-center justify-center gap-2 cursor-pointer"
+                    className="w-full py-3.5 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] text-zinc-950 font-bold text-sm rounded-xl border border-[#e2d9ca] transition active:scale-98 shadow-2xs flex items-center justify-center gap-2 cursor-pointer"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     <span>Confirm Payment Status</span>
                   </button>
                 )}

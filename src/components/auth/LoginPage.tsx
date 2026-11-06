@@ -823,11 +823,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               <button
                 type="button"
                 onClick={onOpenDownloadApp}
-                className="w-11 h-11 rounded-full bg-zinc-800/90 hover:bg-zinc-900 active:scale-90 text-white flex items-center justify-center shadow-lg border border-white/20 transition-all cursor-pointer"
+                className="w-11 h-11 rounded-full bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-90 text-zinc-900 flex items-center justify-center shadow-md border border-[#e2d9ca] transition-all cursor-pointer"
                 title="SharkPay 2.0 Native App"
                 aria-label="SharkPay 2.0 Native App"
               >
-                <Smartphone className="w-5 h-5 text-zinc-100" />
+                <Smartphone className="w-5 h-5 text-zinc-800" />
               </button>
             </div>
           )}

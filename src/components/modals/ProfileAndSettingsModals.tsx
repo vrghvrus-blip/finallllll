@@ -153,10 +153,10 @@ export const GoogleAuthModal: React.FC<GoogleAuthModalProps> = ({
           <button
             type="button"
             onClick={isEnabled ? () => onToggleAuth(false) : handleVerify}
-            className={`w-full py-3.5 font-bold text-sm rounded-xl transition active:scale-95 shadow-sm ${
+            className={`w-full py-3.5 font-bold text-sm rounded-xl transition active:scale-95 shadow-2xs ${
               isEnabled
                 ? 'bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100'
-                : 'bg-black text-white hover:bg-zinc-800'
+                : 'bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] text-zinc-950 border border-[#e2d9ca]'
             }`}
           >
             {isEnabled ? 'Disable Google Authenticator' : 'Verify & Enable'}
@@ -265,7 +265,7 @@ export const ContactUsModal: React.FC<ContactUsModalProps> = ({ isOpen, onClose 
               <button
                 type="submit"
                 disabled={!ticketMsg}
-                className="w-full py-3 bg-black text-white font-bold text-xs rounded-xl hover:bg-zinc-800 transition active:scale-95 disabled:opacity-50"
+                className="w-full py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-95 text-zinc-950 font-bold text-xs rounded-xl border border-[#e2d9ca] transition shadow-2xs disabled:opacity-50"
               >
                 Submit Ticket
               </button>
@@ -331,15 +331,15 @@ export const LanguagesModal: React.FC<LanguagesModalProps> = ({
               }}
               className={`w-full p-3.5 rounded-xl border flex items-center justify-between text-left transition ${
                 currentLanguage === l.name
-                  ? 'border-black bg-zinc-900 text-white font-bold'
-                  : 'border-zinc-100 bg-white text-zinc-800 hover:border-zinc-200'
+                  ? 'border-[#c9bea9] bg-[#f4efe6] text-zinc-950 font-bold shadow-2xs'
+                  : 'border-zinc-200 bg-white text-zinc-800 hover:bg-[#faf7f2]'
               }`}
             >
               <div>
                 <div className="text-sm">{l.name}</div>
                 <div className="text-[11px] opacity-75">{l.native}</div>
               </div>
-              {currentLanguage === l.name && <Check className="w-4 h-4 text-white" />}
+              {currentLanguage === l.name && <Check className="w-4 h-4 text-emerald-600" />}
             </button>
           ))}
         </div>
@@ -389,7 +389,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
         <form onSubmit={handleSave} className="p-5 space-y-4">
           <div className="flex justify-center">
-            <div className="w-20 h-20 rounded-full bg-zinc-900 text-white flex items-center justify-center text-3xl font-black shadow-md border-4 border-zinc-100">
+            <div className="w-20 h-20 rounded-full bg-[#f4efe6] text-zinc-900 flex items-center justify-center text-3xl font-black shadow-xs border-4 border-[#e2d9ca]">
               {nickname.slice(0, 1).toUpperCase()}
             </div>
           </div>
@@ -410,7 +410,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
               type="text"
               value={nickname}
               onChange={(e) => setNickname(e.target.value)}
-              className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-xs font-semibold text-zinc-900 focus:outline-none focus:border-black"
+              className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-xs font-semibold text-zinc-900 focus:outline-none focus:border-[#c9bea9]"
             />
           </div>
 
@@ -420,13 +420,13 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
               type="text"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
-              className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-xs font-semibold text-zinc-900 focus:outline-none focus:border-black"
+              className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-xs font-semibold text-zinc-900 focus:outline-none focus:border-[#c9bea9]"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-3.5 bg-black text-white font-bold text-sm rounded-xl hover:bg-zinc-800 transition active:scale-95 shadow-sm"
+            className="w-full py-3.5 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] text-zinc-950 font-bold text-sm rounded-xl border border-[#e2d9ca] transition active:scale-95 shadow-2xs"
           >
             Save Changes
           </button>
@@ -483,16 +483,16 @@ export const ShareModal: React.FC<ShareModalProps> = ({
         </div>
 
         <div className="p-6 space-y-4 text-center">
-          <div className="bg-gradient-to-br from-zinc-900 via-neutral-900 to-black text-white rounded-2xl p-6 shadow-xl space-y-4">
-            <h4 className="text-xl font-black tracking-tight text-white flex items-center justify-center gap-1.5">
+          <div className="bg-gradient-to-b from-[#fdfcf9] to-[#f7f4ee] border border-[#eee6d8] text-zinc-900 rounded-2xl p-6 shadow-sm space-y-4">
+            <h4 className="text-xl font-black tracking-tight text-zinc-950 flex items-center justify-center gap-1.5">
               <span>🦈</span>
               <span>SharkPay Partner</span>
             </h4>
-            <p className="text-xs text-zinc-300">
+            <p className="text-xs text-zinc-600">
               Join my settlement team and earn 3.5% daily yields + 10% team commission!
             </p>
 
-            <div className="w-44 h-44 bg-white rounded-xl mx-auto p-2 flex items-center justify-center shadow-md">
+            <div className="w-44 h-44 bg-white rounded-xl mx-auto p-2 flex items-center justify-center shadow-xs border border-[#eee6d8]">
               {qrCodeUrl ? (
                 <img src={qrCodeUrl} alt="Invite QR" className="w-40 h-40" />
               ) : (
@@ -500,11 +500,11 @@ export const ShareModal: React.FC<ShareModalProps> = ({
               )}
             </div>
 
-            <div className="bg-white/10 rounded-xl p-2.5">
-              <span className="text-[10px] uppercase text-zinc-400 font-bold block">
+            <div className="bg-white border border-[#eee6d8] rounded-xl p-2.5 shadow-2xs">
+              <span className="text-[10px] uppercase text-zinc-500 font-bold block">
                 Exclusive Invite Code
               </span>
-              <span className="text-lg font-mono font-black text-amber-300 tracking-wider">
+              <span className="text-lg font-mono font-black text-amber-600 tracking-wider">
                 {inviteCode}
               </span>
             </div>
@@ -513,9 +513,9 @@ export const ShareModal: React.FC<ShareModalProps> = ({
           <button
             type="button"
             onClick={handleCopy}
-            className="w-full py-3 bg-black text-white font-bold text-sm rounded-xl hover:bg-zinc-800 transition active:scale-95 shadow-sm flex items-center justify-center gap-2"
+            className="w-full py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-95 text-zinc-950 font-bold text-sm rounded-xl border border-[#e2d9ca] transition shadow-2xs flex items-center justify-center gap-2"
           >
-            {copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+            {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
             <span>{copied ? 'Link Copied to Clipboard!' : 'Copy Invitation Link'}</span>
           </button>
         </div>

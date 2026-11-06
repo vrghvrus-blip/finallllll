@@ -129,8 +129,8 @@ export const BuyQuotaModal: React.FC<BuyQuotaModalProps> = ({
               onClick={() => setPaymentMethod('upi')}
               className={`p-3 rounded-xl border text-center transition ${
                 paymentMethod === 'upi'
-                  ? 'border-black bg-zinc-900 text-white font-bold'
-                  : 'border-zinc-200 bg-white text-zinc-700 font-medium'
+                  ? 'border-[#c9bea9] bg-[#f4efe6] text-zinc-950 font-bold shadow-2xs'
+                  : 'border-zinc-200 bg-white text-zinc-700 font-medium hover:bg-zinc-50'
               }`}
             >
               <div className="text-xs">Direct UPI QR</div>
@@ -140,8 +140,8 @@ export const BuyQuotaModal: React.FC<BuyQuotaModalProps> = ({
               onClick={() => setPaymentMethod('balance')}
               className={`p-3 rounded-xl border text-center transition ${
                 paymentMethod === 'balance'
-                  ? 'border-black bg-zinc-900 text-white font-bold'
-                  : 'border-zinc-200 bg-white text-zinc-700 font-medium'
+                  ? 'border-[#c9bea9] bg-[#f4efe6] text-zinc-950 font-bold shadow-2xs'
+                  : 'border-zinc-200 bg-white text-zinc-700 font-medium hover:bg-zinc-50'
               }`}
             >
               <div className="text-xs">Wallet Balance</div>
@@ -151,21 +151,21 @@ export const BuyQuotaModal: React.FC<BuyQuotaModalProps> = ({
           {paymentMethod === 'upi' ? (
             <div className="space-y-3">
               {/* Official SharkPay 2.0 UPI QR Stand */}
-              <div className="bg-gradient-to-b from-[#0a1128] via-[#0d1b3a] to-[#080d1a] border border-blue-500/30 rounded-2xl p-4 flex flex-col items-center justify-center text-white shadow-xl relative overflow-hidden">
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500"></div>
+              <div className="bg-gradient-to-b from-[#fdfcf9] to-[#f7f4ee] border border-[#eee6d8] rounded-2xl p-4 flex flex-col items-center justify-center text-zinc-900 shadow-xs relative overflow-hidden">
+                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500"></div>
 
                 <div className="w-full flex items-center justify-between mb-2">
-                  <span className="text-[11px] font-black tracking-wider uppercase text-cyan-400 flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                  <span className="text-[11px] font-black tracking-wider uppercase text-zinc-800 flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     Official UPI QR Stand
                   </span>
-                  <span className="text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold bg-[#f4efe6] text-zinc-800 border border-[#e2d9ca] px-2 py-0.5 rounded-full">
                     GPay • PhonePe • Paytm
                   </span>
                 </div>
 
                 {/* The Uploaded Official Stand Photo */}
-                <div className="relative my-2 rounded-xl overflow-hidden border-2 border-cyan-400/40 shadow-[0_0_25px_rgba(34,211,238,0.25)] max-w-[210px] bg-black">
+                <div className="relative my-2 rounded-xl overflow-hidden border-2 border-[#e2d9ca] shadow-xs max-w-[210px] bg-white">
                   <img
                     src="/assets/aistudio/IMG_20261105_184316_1e6b18e8.png"
                     alt="SharkPay 2.0 Official UPI QR"
@@ -174,29 +174,29 @@ export const BuyQuotaModal: React.FC<BuyQuotaModalProps> = ({
                   />
                 </div>
 
-                <p className="text-[11px] text-zinc-300 font-medium mt-1 text-center">
+                <p className="text-[11px] text-zinc-600 font-medium mt-1 text-center">
                   Scan Stand QR above with any UPI app to pay
                 </p>
 
                 {/* Bank Account info from photo */}
-                <div className="w-full mt-2 pt-2 border-t border-white/10 flex items-center justify-between text-[11px] text-zinc-300">
-                  <span className="text-zinc-400">Bank Account:</span>
-                  <span className="font-bold text-white">Bank Of Maharashtra **** 4002</span>
+                <div className="w-full mt-2 pt-2 border-t border-[#eee6d8] flex items-center justify-between text-[11px] text-zinc-600">
+                  <span className="text-zinc-500">Bank Account:</span>
+                  <span className="font-bold text-zinc-900">Bank Of Maharashtra **** 4002</span>
                 </div>
               </div>
 
               {/* VPA copy card */}
-              <div className="bg-zinc-50 border border-zinc-200 rounded-xl p-3 flex items-center justify-between">
+              <div className="bg-[#fdfcf9] border border-[#eee6d8] rounded-xl p-3 flex items-center justify-between shadow-2xs">
                 <div>
-                  <div className="text-[10px] font-bold text-zinc-400 uppercase">Merchant UPI ID</div>
+                  <div className="text-[10px] font-bold text-zinc-500 uppercase">Merchant UPI ID</div>
                   <div className="text-xs font-mono font-black text-zinc-900">{merchantUpi}</div>
                 </div>
                 <button
                   type="button"
                   onClick={handleCopyVpa}
-                  className="px-3.5 py-1.5 bg-black text-white hover:bg-zinc-800 rounded-lg text-xs font-bold flex items-center gap-1 active:scale-95 transition shadow-xs cursor-pointer"
+                  className="px-3.5 py-1.5 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] text-zinc-950 border border-[#e2d9ca] rounded-lg text-xs font-bold flex items-center gap-1 active:scale-95 transition shadow-2xs cursor-pointer"
                 >
-                  {copiedVpa ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedVpa ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedVpa ? 'Copied' : 'Copy UPI'}</span>
                 </button>
               </div>
@@ -226,7 +226,7 @@ export const BuyQuotaModal: React.FC<BuyQuotaModalProps> = ({
                     setUtrNumber(e.target.value.replace(/\D/g, ''));
                     setError('');
                   }}
-                  className="w-full bg-zinc-50 border border-zinc-200 rounded-xl p-3 text-xs font-semibold text-zinc-900 focus:outline-none focus:border-black font-mono tracking-wider"
+                  className="w-full bg-white border border-zinc-200 rounded-xl p-3 text-xs font-semibold text-zinc-900 focus:outline-none focus:border-[#c9bea9] font-mono tracking-wider"
                 />
               </div>
             </div>
@@ -255,7 +255,7 @@ export const BuyQuotaModal: React.FC<BuyQuotaModalProps> = ({
             type="button"
             disabled={isSubmitting}
             onClick={handleConfirm}
-            className="w-full py-3.5 bg-black text-white font-bold text-sm rounded-xl hover:bg-zinc-800 transition active:scale-95 shadow-sm disabled:opacity-50"
+            className="w-full py-3.5 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-95 text-zinc-950 font-bold text-sm rounded-xl border border-[#e2d9ca] transition shadow-2xs disabled:opacity-50"
           >
             {isSubmitting ? 'Verifying Transaction...' : 'I Have Paid, Confirm Order'}
           </button>

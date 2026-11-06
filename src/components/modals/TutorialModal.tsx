@@ -104,7 +104,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ type, onClose }) =
           <div className="space-y-3">
             {current.steps.map((step, idx) => (
               <div key={idx} className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-black text-white text-[11px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+                <div className="w-5 h-5 rounded-full bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] text-[11px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
                   {idx + 1}
                 </div>
                 <p className="text-xs text-zinc-700 leading-snug">{step}</p>
@@ -120,7 +120,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ type, onClose }) =
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-3 bg-black text-white font-bold text-sm rounded-xl hover:bg-zinc-800 transition"
+            className="w-full py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-[0.99] text-zinc-950 font-bold text-sm rounded-xl border border-[#e2d9ca] transition shadow-2xs"
           >
             I Understand, Continue
           </button>

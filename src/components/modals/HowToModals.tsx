@@ -45,7 +45,7 @@ export const HowBindUpiModal: React.FC<HowBindUpiModalProps> = ({
 
           <div className="space-y-3.5">
             <div className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-black text-white font-bold flex items-center justify-center flex-shrink-0 text-xs">
+              <span className="w-6 h-6 rounded-full bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] font-bold flex items-center justify-center flex-shrink-0 text-xs">
                 1
               </span>
               <div>
@@ -58,7 +58,7 @@ export const HowBindUpiModal: React.FC<HowBindUpiModalProps> = ({
             </div>
 
             <div className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-black text-white font-bold flex items-center justify-center flex-shrink-0 text-xs">
+              <span className="w-6 h-6 rounded-full bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] font-bold flex items-center justify-center flex-shrink-0 text-xs">
                 2
               </span>
               <div>
@@ -70,7 +70,7 @@ export const HowBindUpiModal: React.FC<HowBindUpiModalProps> = ({
             </div>
 
             <div className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-black text-white font-bold flex items-center justify-center flex-shrink-0 text-xs">
+              <span className="w-6 h-6 rounded-full bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] font-bold flex items-center justify-center flex-shrink-0 text-xs">
                 3
               </span>
               <div>
@@ -90,7 +90,7 @@ export const HowBindUpiModal: React.FC<HowBindUpiModalProps> = ({
                 onClose();
                 onOpenAddNew();
               }}
-              className="w-full py-3 bg-black text-white font-bold text-sm rounded-xl hover:bg-zinc-800 transition active:scale-95 shadow-sm"
+              className="w-full py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-[0.99] text-zinc-950 font-bold text-sm rounded-xl border border-[#e2d9ca] transition shadow-2xs"
             >
               Add New Account Now
             </button>
@@ -139,7 +139,7 @@ export const HowBuyQuotaModal: React.FC<HowBuyQuotaModalProps> = ({ isOpen, onCl
 
           <div className="space-y-3">
             <div className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-black text-white font-bold flex items-center justify-center flex-shrink-0 text-xs">
+              <span className="w-6 h-6 rounded-full bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] font-bold flex items-center justify-center flex-shrink-0 text-xs">
                 1
               </span>
               <div>
@@ -152,7 +152,7 @@ export const HowBuyQuotaModal: React.FC<HowBuyQuotaModalProps> = ({ isOpen, onCl
             </div>
 
             <div className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-black text-white font-bold flex items-center justify-center flex-shrink-0 text-xs">
+              <span className="w-6 h-6 rounded-full bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] font-bold flex items-center justify-center flex-shrink-0 text-xs">
                 2
               </span>
               <div>
@@ -165,7 +165,7 @@ export const HowBuyQuotaModal: React.FC<HowBuyQuotaModalProps> = ({ isOpen, onCl
             </div>
 
             <div className="flex gap-3">
-              <span className="w-6 h-6 rounded-full bg-black text-white font-bold flex items-center justify-center flex-shrink-0 text-xs">
+              <span className="w-6 h-6 rounded-full bg-[#f4efe6] text-zinc-900 border border-[#e2d9ca] font-bold flex items-center justify-center flex-shrink-0 text-xs">
                 3
               </span>
               <div>
@@ -181,7 +181,7 @@ export const HowBuyQuotaModal: React.FC<HowBuyQuotaModalProps> = ({ isOpen, onCl
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-3 bg-black text-white font-bold text-sm rounded-xl hover:bg-zinc-800 transition"
+            className="w-full py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-[0.99] text-zinc-950 font-bold text-sm rounded-xl border border-[#e2d9ca] transition shadow-2xs"
           >
             I Understand
           </button>

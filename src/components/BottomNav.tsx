@@ -8,13 +8,13 @@ interface BottomNavProps {
 
 export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onSelectTab }) => {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/92 backdrop-blur-xl border-t border-zinc-200/75 z-40 px-2 py-1.5 flex items-center justify-around select-none shadow-[0_-8px_24px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.9)]">
+    <nav className="fixed bottom-0 left-0 right-0 max-w-[460px] mx-auto bg-white/95 backdrop-blur-md border-t border-zinc-200/80 z-40 px-2 py-2 flex items-center justify-around select-none shadow-[0_-4px_20px_rgba(0,0,0,0.03)]">
       {/* Home */}
       <button
         type="button"
         onClick={() => onSelectTab('home')}
-        className={`flex flex-col items-center justify-center flex-1 py-1 transition-all duration-200 active:scale-95 cursor-pointer ${
-          activeTab === 'home' ? 'text-zinc-950 font-bold scale-[1.03]' : 'text-zinc-400 font-medium hover:text-zinc-600'
+        className={`flex flex-col items-center justify-center flex-1 py-1 min-h-[44px] transition-colors cursor-pointer ${
+          activeTab === 'home' ? 'text-zinc-950 font-bold' : 'text-zinc-400 font-medium hover:text-zinc-600'
         }`}
       >
         <svg className="w-5 h-5 fill-current transition-transform duration-200" viewBox="0 0 24 24">
@@ -22,7 +22,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onSelectTab }) 
         </svg>
         <span className="text-[11px] mt-0.5 tracking-tight">Home</span>
         {activeTab === 'home' && (
-          <div className="w-1.5 h-1 bg-zinc-950 rounded-full mt-0.5 transition-all shadow-[0_0_6px_rgba(0,0,0,0.3)]" />
+          <div className="w-1.5 h-1 bg-[#c96b20] rounded-full mt-0.5 transition-all shadow-[0_0_4px_rgba(201,107,32,0.4)]" />
         )}
       </button>
 
@@ -30,8 +30,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onSelectTab }) 
       <button
         type="button"
         onClick={() => onSelectTab('deposit')}
-        className={`flex flex-col items-center justify-center flex-1 py-1 transition-all duration-200 active:scale-95 cursor-pointer ${
-          activeTab === 'deposit' ? 'text-zinc-950 font-bold scale-[1.03]' : 'text-zinc-400 font-medium hover:text-zinc-600'
+        className={`flex flex-col items-center justify-center flex-1 py-1 min-h-[44px] transition-colors cursor-pointer ${
+          activeTab === 'deposit' ? 'text-zinc-950 font-bold' : 'text-zinc-400 font-medium hover:text-zinc-600'
         }`}
       >
         <div className="w-5 h-5 flex items-center justify-center">
@@ -41,7 +41,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onSelectTab }) 
         </div>
         <span className="text-[11px] mt-0.5 tracking-tight">Deposit</span>
         {activeTab === 'deposit' && (
-          <div className="w-1.5 h-1 bg-zinc-950 rounded-full mt-0.5 transition-all shadow-[0_0_6px_rgba(0,0,0,0.3)]" />
+          <div className="w-1.5 h-1 bg-[#c96b20] rounded-full mt-0.5 transition-all shadow-[0_0_4px_rgba(201,107,32,0.4)]" />
         )}
       </button>
 
@@ -49,8 +49,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onSelectTab }) 
       <button
         type="button"
         onClick={() => onSelectTab('upi')}
-        className={`flex flex-col items-center justify-center flex-1 py-1 transition-all duration-200 active:scale-95 cursor-pointer ${
-          activeTab === 'upi' ? 'text-zinc-950 font-bold scale-[1.03]' : 'text-zinc-400 font-medium hover:text-zinc-600'
+        className={`flex flex-col items-center justify-center flex-1 py-1 min-h-[44px] transition-colors cursor-pointer ${
+          activeTab === 'upi' ? 'text-zinc-950 font-bold' : 'text-zinc-400 font-medium hover:text-zinc-600'
         }`}
       >
         <svg className="w-5 h-5 fill-current transition-transform duration-200" viewBox="0 0 24 24">
@@ -58,7 +58,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onSelectTab }) 
         </svg>
         <span className="text-[11px] mt-0.5 tracking-tight">UPI</span>
         {activeTab === 'upi' && (
-          <div className="w-1.5 h-1 bg-zinc-950 rounded-full mt-0.5 transition-all shadow-[0_0_6px_rgba(0,0,0,0.3)]" />
+          <div className="w-1.5 h-1 bg-[#c96b20] rounded-full mt-0.5 transition-all shadow-[0_0_4px_rgba(201,107,32,0.4)]" />
         )}
       </button>
 
@@ -66,8 +66,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onSelectTab }) 
       <button
         type="button"
         onClick={() => onSelectTab('team')}
-        className={`flex flex-col items-center justify-center flex-1 py-1 transition-all duration-200 active:scale-95 cursor-pointer ${
-          activeTab === 'team' ? 'text-zinc-950 font-bold scale-[1.03]' : 'text-zinc-400 font-medium hover:text-zinc-600'
+        className={`flex flex-col items-center justify-center flex-1 py-1 min-h-[44px] transition-colors cursor-pointer ${
+          activeTab === 'team' ? 'text-zinc-950 font-bold' : 'text-zinc-400 font-medium hover:text-zinc-600'
         }`}
       >
         <svg className="w-5 h-5 fill-current transition-transform duration-200" viewBox="0 0 24 24">
@@ -75,7 +75,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onSelectTab }) 
         </svg>
         <span className="text-[11px] mt-0.5 tracking-tight">Team</span>
         {activeTab === 'team' && (
-          <div className="w-1.5 h-1 bg-zinc-950 rounded-full mt-0.5 transition-all shadow-[0_0_6px_rgba(0,0,0,0.3)]" />
+          <div className="w-1.5 h-1 bg-[#c96b20] rounded-full mt-0.5 transition-all shadow-[0_0_4px_rgba(201,107,32,0.4)]" />
         )}
       </button>
 
@@ -83,8 +83,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onSelectTab }) 
       <button
         type="button"
         onClick={() => onSelectTab('me')}
-        className={`flex flex-col items-center justify-center flex-1 py-1 transition-all duration-200 active:scale-95 cursor-pointer ${
-          activeTab === 'me' ? 'text-zinc-950 font-bold scale-[1.03]' : 'text-zinc-400 font-medium hover:text-zinc-600'
+        className={`flex flex-col items-center justify-center flex-1 py-1 min-h-[44px] transition-colors cursor-pointer ${
+          activeTab === 'me' ? 'text-zinc-950 font-bold' : 'text-zinc-400 font-medium hover:text-zinc-600'
         }`}
       >
         <svg className="w-5 h-5 fill-current transition-transform duration-200" viewBox="0 0 24 24">
@@ -92,7 +92,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onSelectTab }) 
         </svg>
         <span className="text-[11px] mt-0.5 tracking-tight">Me</span>
         {activeTab === 'me' && (
-          <div className="w-1.5 h-1 bg-zinc-950 rounded-full mt-0.5 transition-all shadow-[0_0_6px_rgba(0,0,0,0.3)]" />
+          <div className="w-1.5 h-1 bg-[#c96b20] rounded-full mt-0.5 transition-all shadow-[0_0_4px_rgba(201,107,32,0.4)]" />
         )}
       </button>
     </nav>

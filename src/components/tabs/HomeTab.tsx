@@ -3,6 +3,7 @@ import { ChevronRight } from 'lucide-react';
 import { UserProfile, TokenRecord, RechargeRecord, TeamMember } from '../../types/rswallet';
 import { FreeChargeLogoTile, IndusIndLogoTile, PhonePeMultiLogoTile } from '../PaymentLogos';
 import { HomeAnalytics } from '../analytics/HomeAnalytics';
+import { HeaderAdBanner } from '../home/HeaderAdBanner';
 
 interface HomeTabProps {
   user: UserProfile;
@@ -12,6 +13,7 @@ interface HomeTabProps {
   onOpenTopUp: () => void;
   onOpenNewbieGuide: () => void;
   onOpenNewbieReward: () => void;
+  onOpenLuckyWheel?: () => void;
   onOpenTutorial: (type: 'freecharge' | 'indus' | 'phonepe') => void;
   onNavigateTab: (tab: 'deposit' | 'team' | 'me') => void;
   onOpenHistory: (type: 'recharge' | 'token') => void;
@@ -25,214 +27,170 @@ export const HomeTab: React.FC<HomeTabProps> = ({
   onOpenTopUp,
   onOpenNewbieGuide,
   onOpenNewbieReward,
+  onOpenLuckyWheel,
   onOpenTutorial,
   onNavigateTab,
   onOpenHistory,
 }) => {
   return (
     <div className="space-y-4 pb-20">
-      {/* Title Header matching screenshot_1_65b9a505.png */}
-      <div className="pt-2 flex items-center justify-between">
-        <h1 className="text-2xl font-black text-zinc-950 tracking-tight flex items-center gap-2.5">
+      {/* Single Clean Top Brand Header */}
+      <div className="pt-1 flex items-center justify-between">
+        <div className="flex items-center gap-2.5">
           <img
             src="/assets/sharkpay-logo.png"
             alt="SharkPay 2.0"
-            className="w-8 h-8 rounded-xl object-cover shadow-2xs border border-zinc-200/80"
+            className="w-9 h-9 rounded-xl object-cover border border-zinc-200/80 shadow-2xs"
           />
-          <span className="font-black text-2xl tracking-tight text-zinc-950">SharkPay 2.0</span>
-        </h1>
-        <span className="text-xs font-bold text-zinc-600 bg-white/90 border border-zinc-200/90 px-3 py-0.5 rounded-lg shadow-2xs tracking-wider">
-          V2.0
-        </span>
+          <div>
+            <h1 className="text-xl font-bold text-zinc-950 tracking-tight leading-none">SharkPay 2.0</h1>
+            <span className="text-[11px] text-zinc-500 font-medium">Native UPI & USDT Settlement</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/70 px-2.5 py-1 rounded-full">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span>Online</span>
+        </div>
       </div>
 
-      {/* Hero Banner: A must read for newbies matching screenshot_1_65b9a505.png */}
-      <div className="relative rounded-[24px] bg-[#0c0e14] text-white p-5 overflow-hidden shadow-sm">
-        <div className="relative z-10 max-w-[62%]">
-          <h2 className="text-xl font-bold tracking-tight leading-snug">
-            A must read <span className="text-[#38bdf8]">for</span>
-            <span className="text-[#22c55e] block font-black text-2xl mt-0.5">newbies</span>
-          </h2>
-          <p className="text-xs text-zinc-400 mt-1 mb-3.5 font-normal">How to make more profits</p>
+      {/* Rectangle Type Ad Photo Carousel matching uploaded banners */}
+      <HeaderAdBanner
+        onOpenNewbieGuide={onOpenNewbieGuide}
+        onOpenTeam={() => onNavigateTab('team')}
+        onOpenLuckyWheel={onOpenLuckyWheel || onOpenNewbieReward}
+      />
+
+      {/* Main Balance & Action Card (Milk Colour Light UI) */}
+      <div className="bg-gradient-to-b from-[#fdfcf9] to-[#f7f4ee] text-zinc-900 rounded-2xl p-5 border border-[#eee6d8] shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-4">
+        <div className="flex items-start justify-between">
+          <div>
+            <span className="text-xs font-semibold text-zinc-500">Total Available Balance</span>
+            <div className="text-3xl font-black text-zinc-950 tracking-tight mt-1 tabular-nums">
+              ₹{user.balance.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </div>
+          </div>
+          <div className="text-right">
+            <span className="text-xs font-semibold text-zinc-500">Active Quota</span>
+            <div className="text-lg font-black text-emerald-600 mt-1 tabular-nums">
+              ₹{user.quota.toLocaleString('en-IN')}
+            </div>
+          </div>
+        </div>
+
+        {/* Action Buttons Row */}
+        <div className="grid grid-cols-3 gap-2 pt-2 border-t border-[#eee6d8]">
           <button
             type="button"
-            onClick={onOpenNewbieGuide}
-            className="border border-white/60 bg-black/40 rounded-lg px-4 py-1.5 text-xs font-semibold text-white tracking-wide hover:bg-white/10 active:scale-95 transition"
+            onClick={onOpenTopUp}
+            className="w-full py-2.5 bg-white text-zinc-950 font-bold text-xs rounded-xl hover:bg-[#faf7f2] border border-[#e2d9ca] active:scale-95 transition text-center shadow-2xs cursor-pointer"
           >
-            Click to read
+            + Top Up
           </button>
-        </div>
-
-        {/* 3D Book Illustration on Right matching screenshot_1_65b9a505.png */}
-        <div className="absolute right-3 top-2 bottom-2 w-32 flex items-center justify-center pointer-events-none select-none">
-          <div className="relative transform rotate-[-6deg] hover:rotate-0 transition duration-300">
-            {/* 3D Green Book */}
-            <div className="w-24 h-28 bg-gradient-to-br from-[#52c41a] via-[#49aa19] to-[#237804] rounded-xl shadow-xl border-l-4 border-[#389e0d] flex items-center justify-center relative">
-              {/* Dollar Coin Emblem on Book */}
-              <div className="w-12 h-12 rounded-full bg-gradient-to-b from-[#ffd666] to-[#d48806] shadow-md border-2 border-[#fffb8f] flex items-center justify-center">
-                <span className="text-xl font-black text-[#874d00] leading-none">$</span>
-              </div>
-              {/* Bookmark Ribbon */}
-              <div className="absolute -bottom-2 right-4 w-4 h-6 bg-[#ff4d4f] rounded-b-xs shadow-xs"></div>
-            </div>
-            {/* Subtle floating confetti dots */}
-            <div className="absolute -top-1 -left-2 w-2 h-2 bg-yellow-400 rounded-full"></div>
-            <div className="absolute top-4 -right-2 w-1.5 h-1.5 bg-cyan-400 rounded-full"></div>
-            <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-emerald-300 rounded-full opacity-80"></div>
-          </div>
-        </div>
-
-        {/* Carousel Pagination Indicator */}
-        <div className="flex items-center justify-center gap-1.5 mt-4 pt-1">
-          <div className="w-5 h-1 bg-white rounded-full"></div>
-          <div className="w-1.5 h-1.5 bg-white/40 rounded-full"></div>
-        </div>
-      </div>
-
-      {/* Ratio Card matching screenshot_1_65b9a505.png */}
-      <div className="bg-white rounded-[22px] p-4.5 border border-zinc-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] flex items-center justify-between">
-        <div className="flex-1 pr-3">
-          <div className="text-xs font-bold text-zinc-900 tracking-tight">USDT Ratio</div>
-          <div className="text-base font-black text-zinc-950 mt-1">
-            1 USDT ≈ {user.usdtRatio.toFixed(2)} INR
-          </div>
-          <div className="text-[11px] text-zinc-400 mt-0.5 font-medium">
-            Bonus ratio: {user.rewardRatio}%
-          </div>
-        </div>
-
-        <div className="h-10 w-[1px] bg-zinc-200/80"></div>
-
-        <div className="flex-1 pl-5">
-          <div className="text-xs font-bold text-zinc-900 tracking-tight">INR Bonus Ratio</div>
-          <div className="text-2xl font-black text-zinc-950 mt-0.5">
-            {user.inrBonusRatio.toFixed(1)}%
-          </div>
-        </div>
-      </div>
-
-      {/* Newbie Reward Banner matching screenshot_1_65b9a505.png */}
-      <button
-        type="button"
-        onClick={onOpenNewbieReward}
-        className="w-full text-left relative rounded-[22px] bg-gradient-to-r from-[#e8eff8] via-[#f2f6fc] to-[#e4eefb] p-4 flex items-center justify-between overflow-hidden border border-zinc-200/70 shadow-[0_4px_16px_rgba(0,0,0,0.04)] group hover:opacity-95 active:scale-[0.99] transition cursor-pointer"
-      >
-        {/* Pink rounded icon with arch door and rupee coin on left */}
-        <div className="flex items-center gap-3">
-          <div className="w-12 h-12 rounded-xl bg-[#fca5a5] border border-[#f87171]/50 flex items-center justify-center relative flex-shrink-0 shadow-xs">
-            {/* White arch/vault */}
-            <div className="w-5 h-6 bg-white rounded-t-lg shadow-2xs"></div>
-            {/* Rupee coin badge on top right */}
-            <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-amber-400 text-amber-950 font-black text-[10px] flex items-center justify-center shadow-xs border border-amber-300">
-              ₹
-            </div>
-          </div>
-          <span className="text-lg font-black text-[#1e1b4b] tracking-tight">Newbie Reward</span>
-        </div>
-
-        {/* 3D Orange car / machine on right */}
-        <div className="flex items-center gap-2">
-          <div className="w-20 h-10 relative flex items-center justify-end">
-            <div className="w-16 h-7 bg-gradient-to-r from-amber-400 to-orange-500 rounded-lg relative flex items-center shadow-md">
-              <div className="absolute -top-2 left-3 w-8 h-4 bg-white/90 rounded-t-md shadow-2xs"></div>
-              <div className="absolute -bottom-1 left-2 w-3.5 h-3.5 bg-zinc-900 rounded-full border border-white"></div>
-              <div className="absolute -bottom-1 right-2 w-3.5 h-3.5 bg-zinc-900 rounded-full border border-white"></div>
-            </div>
-          </div>
-        </div>
-      </button>
-
-      {/* Top Up Button with "First 🪙" Badge matching screenshot_1_65b9a505.png */}
-      <div className="relative">
-        <button
-          type="button"
-          onClick={onOpenTopUp}
-          className="w-full py-4 bg-black text-white font-bold text-base rounded-[18px] shadow-sm text-center relative overflow-hidden active:scale-[0.99] hover:bg-zinc-900 transition cursor-pointer"
-        >
-          Top up
-          {/* Diagonal Corner Ribbon "First" */}
-          <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden pointer-events-none">
-            <div className="absolute transform rotate-45 bg-[#2563eb] text-[10px] font-black text-white py-0.5 right-[-26px] top-[14px] w-[95px] text-center shadow-sm flex items-center justify-center gap-0.5">
-              <span>🪙</span>
-              <span>First</span>
-            </div>
-          </div>
-        </button>
-      </div>
-
-      {/* Stats Grid matching screenshot_1_65b9a505.png */}
-      <div className="bg-white rounded-[22px] border border-zinc-100 shadow-[0_2px_12px_rgba(0,0,0,0.03)] p-4.5 space-y-4">
-        {/* Top 4 interactive stats - centered vertically without arrow clutter */}
-        <div className="grid grid-cols-2 gap-y-4 gap-x-4">
-          {/* Balance */}
+          <button
+            type="button"
+            onClick={() => onNavigateTab('deposit')}
+            className="w-full py-2.5 bg-white text-zinc-800 font-semibold text-xs rounded-xl hover:bg-[#faf7f2] border border-[#e2d9ca] active:scale-95 transition text-center shadow-2xs cursor-pointer"
+          >
+            Buy Quota
+          </button>
           <button
             type="button"
             onClick={() => onOpenHistory('recharge')}
-            className="flex flex-col items-center justify-center text-center group py-1.5 px-3 hover:bg-zinc-50/60 rounded-xl transition cursor-pointer"
+            className="w-full py-2.5 bg-white text-zinc-800 font-semibold text-xs rounded-xl hover:bg-[#faf7f2] border border-[#e2d9ca] active:scale-95 transition text-center shadow-2xs cursor-pointer"
           >
-            <div className="text-xs font-semibold text-zinc-400">Balance</div>
-            <div className="text-xl font-bold text-zinc-900 mt-0.5">{user.balance}</div>
-          </button>
-
-          {/* Today Received */}
-          <button
-            type="button"
-            onClick={() => onOpenHistory('token')}
-            className="flex flex-col items-center justify-center text-center group py-1.5 px-3 hover:bg-zinc-50/60 rounded-xl transition cursor-pointer"
-          >
-            <div className="text-xs font-semibold text-zinc-400">Today Received</div>
-            <div className="text-xl font-bold text-zinc-900 mt-0.5">
-              {user.todayReceived.toFixed(2)}
-            </div>
-          </button>
-
-          {/* Top up Bonus */}
-          <button
-            type="button"
-            onClick={() => onOpenHistory('token')}
-            className="flex flex-col items-center justify-center text-center group py-1.5 px-3 hover:bg-zinc-50/60 rounded-xl transition cursor-pointer"
-          >
-            <div className="text-xs font-semibold text-zinc-400">Top up Bonus</div>
-            <div className="text-xl font-bold text-zinc-900 mt-0.5">
-              {user.topUpBonus.toFixed(2)}
-            </div>
-          </button>
-
-          {/* Team Commission */}
-          <button
-            type="button"
-            onClick={() => onNavigateTab('team')}
-            className="flex flex-col items-center justify-center text-center group py-1.5 px-3 hover:bg-zinc-50/60 rounded-xl transition cursor-pointer"
-          >
-            <div className="text-xs font-semibold text-zinc-400">Team Commission</div>
-            <div className="text-xl font-bold text-zinc-900 mt-0.5">
-              {user.teamCommission.toFixed(2)}
-            </div>
+            History
           </button>
         </div>
+      </div>
 
-        {/* Divider */}
-        <div className="border-t border-zinc-100"></div>
+      {/* Live USDT Exchange Rate Strip */}
+      <div className="bg-white rounded-2xl p-4 border border-zinc-200/80 shadow-2xs flex items-center justify-between">
+        <div>
+          <span className="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider">USDT Exchange Rate</span>
+          <div className="text-base font-extrabold text-zinc-950 mt-0.5 tabular-nums">
+            1 USDT ≈ ₹{user.usdtRatio.toFixed(2)} INR
+          </div>
+          <span className="text-xs text-emerald-600 font-medium">+{user.inrBonusRatio.toFixed(1)}% bonus on deposits</span>
+        </div>
+        <button
+          type="button"
+          onClick={() => onNavigateTab('deposit')}
+          className="px-3.5 py-1.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-800 text-xs font-semibold rounded-lg transition active:scale-95 cursor-pointer"
+        >
+          Deposit USDT →
+        </button>
+      </div>
 
-        {/* Secondary stats */}
-        <div className="grid grid-cols-2 gap-y-3 gap-x-6 text-center">
-          <div>
-            <div className="text-xs font-semibold text-zinc-400">Yesterday's Recharge</div>
-            <div className="text-base font-bold text-zinc-900 mt-0.5">{user.yesterdayRecharge}</div>
-          </div>
-          <div>
-            <div className="text-xs font-semibold text-zinc-400">Today's Recharge</div>
-            <div className="text-base font-bold text-zinc-900 mt-0.5">{user.todayRecharge}</div>
-          </div>
-          <div>
-            <div className="text-xs font-semibold text-zinc-400">Total Recharge</div>
-            <div className="text-base font-bold text-zinc-900 mt-0.5">{user.totalRecharge}</div>
-          </div>
-          <div>
-            <div className="text-xs font-semibold text-zinc-400">Total Commission</div>
-            <div className="text-base font-bold text-zinc-900 mt-0.5">{user.totalCommission}</div>
+      {/* 4-Stat Performance Overview */}
+      <div className="grid grid-cols-2 gap-2.5">
+        <div
+          onClick={() => onOpenHistory('token')}
+          className="bg-white rounded-2xl p-3.5 border border-zinc-200/80 shadow-2xs cursor-pointer hover:border-zinc-300 transition"
+        >
+          <span className="text-xs font-medium text-zinc-400">Today Received</span>
+          <div className="text-xl font-bold text-zinc-950 mt-1 tabular-nums">
+            ₹{user.todayReceived.toFixed(2)}
           </div>
         </div>
+
+        <div
+          onClick={() => onOpenHistory('token')}
+          className="bg-white rounded-2xl p-3.5 border border-zinc-200/80 shadow-2xs cursor-pointer hover:border-zinc-300 transition"
+        >
+          <span className="text-xs font-medium text-zinc-400">Top up Bonus</span>
+          <div className="text-xl font-bold text-zinc-950 mt-1 tabular-nums">
+            ₹{user.topUpBonus.toFixed(2)}
+          </div>
+        </div>
+
+        <div
+          onClick={() => onNavigateTab('team')}
+          className="bg-white rounded-2xl p-3.5 border border-zinc-200/80 shadow-2xs cursor-pointer hover:border-zinc-300 transition"
+        >
+          <span className="text-xs font-medium text-zinc-400">Team Commission</span>
+          <div className="text-xl font-bold text-zinc-950 mt-1 tabular-nums">
+            ₹{user.teamCommission.toFixed(2)}
+          </div>
+        </div>
+
+        <div
+          onClick={() => onOpenHistory('recharge')}
+          className="bg-white rounded-2xl p-3.5 border border-zinc-200/80 shadow-2xs cursor-pointer hover:border-zinc-300 transition"
+        >
+          <span className="text-xs font-medium text-zinc-400">Total Volume</span>
+          <div className="text-xl font-bold text-zinc-950 mt-1 tabular-nums">
+            ₹{user.totalRecharge.toLocaleString('en-IN')}
+          </div>
+        </div>
+      </div>
+
+      {/* Clean Guide & Rewards Callout */}
+      <div className="grid grid-cols-2 gap-2.5">
+        <button
+          type="button"
+          onClick={onOpenNewbieGuide}
+          className="text-left bg-zinc-50 hover:bg-zinc-100/80 border border-zinc-200/70 rounded-2xl p-3.5 transition cursor-pointer"
+        >
+          <div className="text-xs font-bold text-zinc-900">Beginner's Guide</div>
+          <div className="text-[11px] text-zinc-500 mt-0.5">Learn how to maximize quota earnings</div>
+          <div className="text-xs font-semibold text-zinc-700 mt-2 flex items-center gap-1">
+            <span>Read guide</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </div>
+        </button>
+
+        <button
+          type="button"
+          onClick={onOpenNewbieReward}
+          className="text-left bg-zinc-50 hover:bg-zinc-100/80 border border-zinc-200/70 rounded-2xl p-3.5 transition cursor-pointer"
+        >
+          <div className="text-xs font-bold text-zinc-900">Newbie Rewards</div>
+          <div className="text-[11px] text-zinc-500 mt-0.5">Claim first deposit welcome bonuses</div>
+          <div className="text-xs font-semibold text-zinc-700 mt-2 flex items-center gap-1">
+            <span>Claim bonus</span>
+            <ChevronRight className="w-3.5 h-3.5" />
+          </div>
+        </button>
       </div>
 
       {/* Analytics & 7-Day Performance Visualization Section */}

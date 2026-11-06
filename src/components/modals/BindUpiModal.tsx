@@ -390,8 +390,8 @@ export const BindUpiModal: React.FC<BindUpiModalProps> = ({
                 onClick={() => setAccountType('both')}
                 className={`py-2.5 px-2 rounded-xl border text-center transition cursor-pointer active:scale-95 ${
                   accountType === 'both'
-                    ? 'border-black bg-zinc-900 text-white font-black'
-                    : 'border-zinc-200 bg-white text-zinc-700 font-semibold'
+                    ? 'border-[#c9bea9] bg-[#f4efe6] text-zinc-950 font-black shadow-xs'
+                    : 'border-zinc-200 bg-white text-zinc-700 font-semibold hover:bg-zinc-50'
                 }`}
               >
                 <div className="text-[11px]">Both (Recv & Send)</div>
@@ -401,8 +401,8 @@ export const BindUpiModal: React.FC<BindUpiModalProps> = ({
                 onClick={() => setAccountType('receive')}
                 className={`py-2.5 px-2 rounded-xl border text-center transition cursor-pointer active:scale-95 ${
                   accountType === 'receive'
-                    ? 'border-black bg-zinc-900 text-white font-black'
-                    : 'border-zinc-200 bg-white text-zinc-700 font-semibold'
+                    ? 'border-[#c9bea9] bg-[#f4efe6] text-zinc-950 font-black shadow-xs'
+                    : 'border-zinc-200 bg-white text-zinc-700 font-semibold hover:bg-zinc-50'
                 }`}
               >
                 <div className="text-[11px]">Receive Only</div>
@@ -412,8 +412,8 @@ export const BindUpiModal: React.FC<BindUpiModalProps> = ({
                 onClick={() => setAccountType('send')}
                 className={`py-2.5 px-2 rounded-xl border text-center transition cursor-pointer active:scale-95 ${
                   accountType === 'send'
-                    ? 'border-black bg-zinc-900 text-white font-black'
-                    : 'border-zinc-200 bg-white text-zinc-700 font-semibold'
+                    ? 'border-[#c9bea9] bg-[#f4efe6] text-zinc-950 font-black shadow-xs'
+                    : 'border-zinc-200 bg-white text-zinc-700 font-semibold hover:bg-zinc-50'
                 }`}
               >
                 <div className="text-[11px]">Send Only</div>
@@ -460,16 +460,16 @@ export const BindUpiModal: React.FC<BindUpiModalProps> = ({
             <button
               type="submit"
               disabled={isSuccess}
-              className="w-full py-4 shiny-specular-btn bg-gradient-to-r from-zinc-900 via-black to-zinc-950 text-white font-extrabold text-sm tracking-wide rounded-2xl shadow-md transition-all active:scale-[0.985] cursor-pointer text-center flex items-center justify-center gap-2"
+              className="w-full py-4 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] border border-[#e2d9ca] text-zinc-950 font-extrabold text-sm tracking-wide rounded-2xl shadow-2xs transition-all active:scale-[0.985] cursor-pointer text-center flex items-center justify-center gap-2"
             >
               {isSuccess ? (
                 <>
-                  <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />
+                  <Check className="w-4 h-4 text-emerald-600 stroke-[3]" />
                   <span>Account Bound Successfully!</span>
                 </>
               ) : (
                 <>
-                  <Zap className="w-4 h-4 text-amber-400 fill-amber-400" />
+                  <Zap className="w-4 h-4 text-amber-500 fill-amber-500" />
                   <span>Add & Bind UPI Account</span>
                 </>
               )}

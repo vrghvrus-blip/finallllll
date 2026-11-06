@@ -59,20 +59,20 @@ export const OpenUpiSimulatorModal: React.FC<OpenUpiSimulatorModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-xs p-0 sm:p-4 animate-in fade-in duration-200">
       <div className="bg-white w-full max-w-md rounded-t-3xl sm:rounded-2xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
         {/* Header with App Branding */}
-        <div className="p-4 bg-zinc-950 text-white flex items-center justify-between">
+        <div className="p-4 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] border-b border-[#e2d9ca] text-zinc-900 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center">
-              <Smartphone className="w-4 h-4 text-emerald-400" />
+            <div className="w-8 h-8 rounded-lg bg-white border border-[#e2d9ca] flex items-center justify-center">
+              <Smartphone className="w-4 h-4 text-emerald-600" />
             </div>
             <div>
-              <h3 className="text-sm font-black tracking-tight">{appName} UPI Terminal</h3>
-              <p className="text-[10px] text-zinc-400">NPCI Direct Settlement Gateway</p>
+              <h3 className="text-sm font-black tracking-tight text-zinc-950">{appName} UPI Terminal</h3>
+              <p className="text-[10px] text-zinc-500">NPCI Direct Settlement Gateway</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1 rounded-full text-zinc-400 hover:text-white hover:bg-white/10"
+            className="p-1 rounded-full text-zinc-400 hover:text-zinc-700 hover:bg-[#eee8dc]/60"
           >
             <X className="w-5 h-5" />
           </button>
@@ -116,9 +116,9 @@ export const OpenUpiSimulatorModal: React.FC<OpenUpiSimulatorModalProps> = ({
                   setPinInput('');
                   setPinError('');
                 }}
-                className="w-full py-3 bg-zinc-900 text-white font-bold text-xs rounded-xl hover:bg-black transition active:scale-98 flex items-center justify-center gap-1.5"
+                className="w-full py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-[0.99] text-zinc-950 font-bold text-xs rounded-xl border border-[#e2d9ca] transition shadow-2xs flex items-center justify-center gap-1.5"
               >
-                <Lock className="w-3.5 h-3.5" />
+                <Lock className="w-3.5 h-3.5 text-zinc-600" />
                 <span>Authorize & Enter 6-Digit PIN</span>
               </button>
             ) : (
@@ -146,7 +146,7 @@ export const OpenUpiSimulatorModal: React.FC<OpenUpiSimulatorModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="w-full py-3 bg-black text-white font-bold text-sm rounded-xl hover:bg-zinc-800 transition shadow-sm"
+            className="w-full py-3 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-[0.99] text-zinc-950 font-bold text-sm rounded-xl border border-[#e2d9ca] transition shadow-2xs"
           >
             Close UPI Terminal
           </button>

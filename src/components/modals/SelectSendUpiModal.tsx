@@ -48,7 +48,7 @@ export const SelectSendUpiModal: React.FC<SelectSendUpiModalProps> = ({
                 onClose();
                 onAddNewSendUpi();
               }}
-              className="w-full py-4 bg-black text-white font-bold text-base rounded-2xl hover:bg-zinc-800 active:scale-[0.98] transition shadow-md"
+              className="w-full py-4 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-[0.98] text-zinc-950 font-bold text-base rounded-2xl border border-[#e2d9ca] transition shadow-2xs"
             >
               Add Send UPI
             </button>
@@ -66,8 +66,8 @@ export const SelectSendUpiModal: React.FC<SelectSendUpiModalProps> = ({
                     onClick={() => onSelectAccount(account)}
                     className={`w-full p-3 rounded-2xl border text-left flex items-center justify-between transition ${
                       isSelected
-                        ? 'border-zinc-950 bg-zinc-950 text-white'
-                        : 'border-zinc-200 bg-zinc-50 hover:bg-zinc-100 text-zinc-900'
+                        ? 'border-[#c9bea9] bg-[#f4efe6] text-zinc-950 font-bold shadow-2xs'
+                        : 'border-zinc-200 bg-white hover:bg-[#faf7f2] text-zinc-800'
                     }`}
                   >
                     <div>
@@ -75,7 +75,7 @@ export const SelectSendUpiModal: React.FC<SelectSendUpiModalProps> = ({
                       <div className="text-xs font-mono opacity-80 mt-0.5">{account.upiId}</div>
                     </div>
                     {isSelected ? (
-                      <div className="w-5 h-5 rounded-full bg-white text-zinc-950 flex items-center justify-center">
+                      <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center">
                         <Check className="w-3.5 h-3.5 stroke-[3]" />
                       </div>
                     ) : (
@@ -92,9 +92,9 @@ export const SelectSendUpiModal: React.FC<SelectSendUpiModalProps> = ({
                 onClose();
                 onAddNewSendUpi();
               }}
-              className="w-full py-3 bg-zinc-100 text-zinc-900 font-bold text-xs rounded-xl hover:bg-zinc-200 transition flex items-center justify-center gap-1.5"
+              className="w-full py-3 bg-white text-zinc-900 font-bold text-xs rounded-xl border border-[#e2d9ca] hover:bg-[#faf7f2] transition flex items-center justify-center gap-1.5 shadow-2xs"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus className="w-3.5 h-3.5 text-zinc-600" />
               <span>Add Another Send UPI</span>
             </button>
           </div>

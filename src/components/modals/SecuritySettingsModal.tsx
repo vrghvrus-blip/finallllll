@@ -246,7 +246,7 @@ export const SecuritySettingsModal: React.FC<SecuritySettingsModalProps> = ({
                     type="button"
                     onClick={toggleBiometrics}
                     className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-200 ease-in-out ${
-                      user.isBiometricEnabled ? 'bg-zinc-900' : 'bg-zinc-300'
+                      user.isBiometricEnabled ? 'bg-emerald-600' : 'bg-zinc-300'
                     }`}
                   >
                     <div
@@ -265,8 +265,8 @@ export const SecuritySettingsModal: React.FC<SecuritySettingsModalProps> = ({
                         onClick={() => onUpdateSecurity({ biometricType: 'fingerprint' })}
                         className={`text-xs px-2.5 py-1 rounded-lg font-bold transition ${
                           user.biometricType === 'fingerprint'
-                            ? 'bg-zinc-900 text-white'
-                            : 'bg-zinc-200 text-zinc-700'
+                            ? 'bg-[#f4efe6] text-zinc-950 border border-[#e2d9ca] shadow-2xs'
+                            : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
                         }`}
                       >
                         Fingerprint
@@ -276,8 +276,8 @@ export const SecuritySettingsModal: React.FC<SecuritySettingsModalProps> = ({
                         onClick={() => onUpdateSecurity({ biometricType: 'face_id' })}
                         className={`text-xs px-2.5 py-1 rounded-lg font-bold transition ${
                           user.biometricType === 'face_id'
-                            ? 'bg-zinc-900 text-white'
-                            : 'bg-zinc-200 text-zinc-700'
+                            ? 'bg-[#f4efe6] text-zinc-950 border border-[#e2d9ca] shadow-2xs'
+                            : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
                         }`}
                       >
                         Face ID
@@ -499,7 +499,7 @@ export const SecuritySettingsModal: React.FC<SecuritySettingsModalProps> = ({
               <button
                 type="submit"
                 disabled={totpCode.length !== 6}
-                className="w-full py-3.5 bg-zinc-900 text-white font-bold text-sm rounded-xl hover:bg-black transition disabled:opacity-50"
+                className="w-full py-3.5 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-[0.99] text-zinc-950 font-bold text-sm rounded-xl border border-[#e2d9ca] transition shadow-2xs disabled:opacity-50"
               >
                 Verify & Activate Authenticator
               </button>
@@ -527,7 +527,7 @@ export const SecuritySettingsModal: React.FC<SecuritySettingsModalProps> = ({
                     setSmsOtp(generatedSmsCode);
                     setErrorMsg('');
                   }}
-                  className="p-3 bg-zinc-950 text-white rounded-2xl shadow-lg border border-zinc-700/70 cursor-pointer active:scale-[0.99] transition flex items-center justify-between"
+                  className="p-3 bg-gradient-to-b from-[#fdfcf9] to-[#f7f4ee] text-zinc-900 rounded-2xl shadow-xs border border-[#eee6d8] cursor-pointer active:scale-[0.99] transition flex items-center justify-between"
                   title="Tap to autofill received verification code"
                 >
                   <div className="flex items-center gap-2.5">
@@ -535,12 +535,12 @@ export const SecuritySettingsModal: React.FC<SecuritySettingsModalProps> = ({
                       SMS
                     </div>
                     <div>
-                      <div className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+                      <div className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">
                         SharkPay Security Service
                       </div>
-                      <div className="text-xs font-semibold text-white">
-                        Code: <span className="font-mono font-bold text-emerald-400 tracking-wider">{generatedSmsCode}</span>
-                        <span className="text-zinc-400 ml-1.5 text-[10px]">(Tap to paste)</span>
+                      <div className="text-xs font-semibold text-zinc-900">
+                        Code: <span className="font-mono font-bold text-emerald-700 tracking-wider">{generatedSmsCode}</span>
+                        <span className="text-zinc-500 ml-1.5 text-[10px]">(Tap to paste)</span>
                       </div>
                     </div>
                   </div>
@@ -608,7 +608,7 @@ export const SecuritySettingsModal: React.FC<SecuritySettingsModalProps> = ({
               <button
                 type="submit"
                 disabled={smsOtp.length !== 6}
-                className="w-full py-3.5 bg-zinc-900 text-white font-bold text-sm rounded-xl hover:bg-black transition disabled:opacity-50"
+                className="w-full py-3.5 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-[0.99] text-zinc-950 font-bold text-sm rounded-xl border border-[#e2d9ca] transition shadow-2xs disabled:opacity-50"
               >
                 Verify & Activate SMS MFA
               </button>

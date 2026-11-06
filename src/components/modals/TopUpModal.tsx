@@ -92,8 +92,8 @@ export const TopUpModal: React.FC<TopUpModalProps> = ({
               onClick={() => setMethod('UPI')}
               className={`p-3 rounded-xl border text-center transition ${
                 method === 'UPI'
-                  ? 'border-black bg-zinc-900 text-white font-bold'
-                  : 'border-zinc-200 bg-white text-zinc-700 font-medium'
+                  ? 'border-[#c9bea9] bg-[#f4efe6] text-zinc-950 font-bold shadow-2xs'
+                  : 'border-zinc-200 bg-white text-zinc-700 font-medium hover:bg-zinc-50'
               }`}
             >
               <div className="text-xs">UPI Fast Settlement</div>
@@ -103,8 +103,8 @@ export const TopUpModal: React.FC<TopUpModalProps> = ({
               onClick={() => setMethod('USDT')}
               className={`p-3 rounded-xl border text-center transition ${
                 method === 'USDT'
-                  ? 'border-black bg-zinc-900 text-white font-bold'
-                  : 'border-zinc-200 bg-white text-zinc-700 font-medium'
+                  ? 'border-[#c9bea9] bg-[#f4efe6] text-zinc-950 font-bold shadow-2xs'
+                  : 'border-zinc-200 bg-white text-zinc-700 font-medium hover:bg-zinc-50'
               }`}
             >
               <div className="text-xs">USDT TRC-20</div>
@@ -113,21 +113,21 @@ export const TopUpModal: React.FC<TopUpModalProps> = ({
 
           {/* UPI Official Stand Info */}
           {method === 'UPI' && (
-            <div className="bg-gradient-to-b from-[#0a1128] via-[#0d1b3a] to-[#080d1a] border border-blue-500/30 rounded-2xl p-4 flex flex-col items-center justify-center text-white shadow-xl relative overflow-hidden animate-in fade-in duration-200">
-              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-500"></div>
+            <div className="bg-gradient-to-b from-[#fdfcf9] to-[#f7f4ee] border border-[#eee6d8] rounded-2xl p-4 flex flex-col items-center justify-center text-zinc-900 shadow-xs relative overflow-hidden animate-in fade-in duration-200">
+              <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500"></div>
 
               <div className="w-full flex items-center justify-between mb-2">
-                <span className="text-[11px] font-black tracking-wider uppercase text-cyan-400 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                <span className="text-[11px] font-black tracking-wider uppercase text-zinc-800 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   SharkPay 2.0 Official UPI QR Stand
                 </span>
-                <span className="text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold bg-[#f4efe6] text-zinc-800 border border-[#e2d9ca] px-2 py-0.5 rounded-full">
                   All UPI Apps
                 </span>
               </div>
 
               {/* The Uploaded Official Stand Photo */}
-              <div className="relative my-2 rounded-xl overflow-hidden border-2 border-cyan-400/40 shadow-[0_0_25px_rgba(34,211,238,0.25)] max-w-[200px] bg-black">
+              <div className="relative my-2 rounded-xl overflow-hidden border-2 border-[#e2d9ca] shadow-xs max-w-[200px] bg-white">
                 <img
                   src="/assets/aistudio/IMG_20261105_184316_1e6b18e8.png"
                   alt="SharkPay 2.0 Official UPI QR Stand"
@@ -136,39 +136,39 @@ export const TopUpModal: React.FC<TopUpModalProps> = ({
                 />
               </div>
 
-              <p className="text-[11px] text-zinc-300 font-medium mt-1 text-center">
+              <p className="text-[11px] text-zinc-600 font-medium mt-1 text-center">
                 Scan QR stand to pay ₹{amountNum > 0 ? amountNum.toLocaleString() : 'amount'}
               </p>
 
               {/* VPA and Bank details */}
-              <div className="w-full mt-3 bg-white/5 border border-white/10 rounded-xl p-2.5 flex items-center justify-between">
+              <div className="w-full mt-3 bg-white border border-[#eee6d8] rounded-xl p-2.5 flex items-center justify-between shadow-2xs">
                 <div>
-                  <div className="text-[10px] text-zinc-400 font-bold uppercase">UPI ID</div>
-                  <div className="text-xs font-mono font-black text-white">{merchantUpi}</div>
-                  <div className="text-[10px] text-zinc-400 mt-0.5">Bank Of Maharashtra **** 4002</div>
+                  <div className="text-[10px] text-zinc-500 font-bold uppercase">UPI ID</div>
+                  <div className="text-xs font-mono font-black text-zinc-900">{merchantUpi}</div>
+                  <div className="text-[10px] text-zinc-500 mt-0.5">Bank Of Maharashtra **** 4002</div>
                 </div>
                 <button
                   type="button"
                   onClick={handleCopyUpi}
-                  className="px-3 py-1.5 bg-cyan-500 hover:bg-cyan-400 active:scale-95 text-zinc-950 font-black text-xs rounded-lg transition flex items-center gap-1 shadow-sm cursor-pointer"
+                  className="px-3 py-1.5 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-95 text-zinc-950 font-bold text-xs rounded-lg border border-[#e2d9ca] transition flex items-center gap-1 shadow-2xs cursor-pointer"
                 >
-                  {copiedUpi ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  {copiedUpi ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                   <span>{copiedUpi ? 'Copied' : 'Copy'}</span>
                 </button>
               </div>
 
               {/* UTR Input */}
               <div className="w-full mt-3 space-y-1 text-left">
-                <label className="text-[11px] font-bold text-zinc-300">12-Digit NPCI UTR / Ref Number</label>
+                <label className="text-[11px] font-bold text-zinc-700">12-Digit NPCI UTR / Ref Number</label>
                 <input
                   type="text"
                   maxLength={12}
                   value={utrNumber}
                   onChange={(e) => setUtrNumber(e.target.value.replace(/\D/g, ''))}
                   placeholder="e.g. 423589123456"
-                  className="w-full bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-xs text-white placeholder-zinc-500 font-mono tracking-wider focus:outline-none focus:border-cyan-400"
+                  className="w-full bg-white border border-zinc-200 rounded-xl px-3 py-2 text-xs text-zinc-900 placeholder-zinc-400 font-mono tracking-wider focus:outline-none focus:border-[#c9bea9]"
                 />
-                {utrError && <p className="text-[10px] text-red-400 font-bold">{utrError}</p>}
+                {utrError && <p className="text-[10px] text-red-500 font-bold">{utrError}</p>}
               </div>
             </div>
           )}
@@ -207,8 +207,8 @@ export const TopUpModal: React.FC<TopUpModalProps> = ({
                   onClick={() => setAmount(val.toString())}
                   className={`py-2.5 rounded-xl border text-xs font-bold transition ${
                     amount === val.toString()
-                      ? 'border-black bg-black text-white'
-                      : 'border-zinc-200 bg-white text-zinc-800 hover:border-zinc-300'
+                      ? 'border-[#c9bea9] bg-[#f4efe6] text-zinc-950 font-black shadow-2xs'
+                      : 'border-zinc-200 bg-white text-zinc-700 hover:bg-zinc-50 font-medium'
                   }`}
                 >
                   ₹{val.toLocaleString()}
@@ -227,7 +227,7 @@ export const TopUpModal: React.FC<TopUpModalProps> = ({
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="Enter amount"
-                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl py-3 pl-8 pr-4 text-base font-bold text-zinc-900 focus:outline-none focus:border-black"
+                className="w-full bg-zinc-50 border border-zinc-200 rounded-xl py-3 pl-8 pr-4 text-base font-bold text-zinc-900 focus:outline-none focus:border-[#c9bea9]"
               />
             </div>
           </div>
@@ -252,7 +252,7 @@ export const TopUpModal: React.FC<TopUpModalProps> = ({
             type="button"
             disabled={isProcessing || amountNum <= 0}
             onClick={handleTopUp}
-            className="w-full py-3.5 bg-black text-white font-bold text-sm rounded-xl hover:bg-zinc-800 transition active:scale-95 shadow-sm disabled:opacity-50"
+            className="w-full py-3.5 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-95 text-zinc-950 font-bold text-sm rounded-xl border border-[#e2d9ca] transition shadow-2xs disabled:opacity-50"
           >
             {isProcessing ? 'Processing Instant Deposit...' : `Proceed to Pay ₹${amountNum.toLocaleString()}`}
           </button>

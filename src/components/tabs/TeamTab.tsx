@@ -8,70 +8,10 @@ interface TeamTabProps {
   onShowShareModal?: () => void;
 }
 
-// Glowing Teal Neural Orb Avatar matching the exact avatar shown in Screenshot_20261103_012840
-export const TeamAvatar: React.FC<{ className?: string }> = ({ className = 'w-12 h-12' }) => (
-  <div className={`${className} rounded-full overflow-hidden flex-shrink-0 bg-[#06151c] relative shadow-2xs`}>
-    <svg viewBox="0 0 100 100" className="w-full h-full">
-      <defs>
-        <radialGradient id="tealOrbGlow" cx="45%" cy="40%" r="55%">
-          <stop offset="0%" stopColor="#2dd4bf" stopOpacity="0.9" />
-          <stop offset="35%" stopColor="#0d9488" stopOpacity="0.5" />
-          <stop offset="75%" stopColor="#042f2e" stopOpacity="0.2" />
-          <stop offset="100%" stopColor="#021417" stopOpacity="0" />
-        </radialGradient>
-        <filter id="tealGlow" x="-30%" y="-30%" width="160%" height="160%">
-          <feGaussianBlur stdDeviation="2.2" result="blur" />
-          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-        </filter>
-      </defs>
-
-      {/* Deep cosmic teal base */}
-      <circle cx="50" cy="50" r="48" fill="#04171d" />
-      <circle cx="50" cy="50" r="48" fill="url(#tealOrbGlow)" />
-
-      {/* Abstract undulating wave strands */}
-      <path
-        d="M 12 62 Q 38 46, 88 56"
-        stroke="#2dd4bf"
-        strokeWidth="2.4"
-        fill="none"
-        opacity="0.85"
-        filter="url(#tealGlow)"
-      />
-      <path
-        d="M 18 42 Q 52 64, 82 36"
-        stroke="#14b8a6"
-        strokeWidth="2"
-        fill="none"
-        opacity="0.75"
-      />
-      <path
-        d="M 22 74 Q 58 68, 76 80"
-        stroke="#0f766e"
-        strokeWidth="1.6"
-        fill="none"
-        opacity="0.6"
-      />
-      <path
-        d="M 24 26 Q 54 16, 76 30"
-        stroke="#5eead4"
-        strokeWidth="1.6"
-        fill="none"
-        opacity="0.7"
-      />
-
-      {/* Glowing network particle dots */}
-      <circle cx="34" cy="50" r="3.2" fill="#ffffff" filter="url(#tealGlow)" />
-      <circle cx="54" cy="54" r="3.4" fill="#a7f3d0" filter="url(#tealGlow)" />
-      <circle cx="70" cy="40" r="2.8" fill="#5eead4" filter="url(#tealGlow)" />
-      <circle cx="82" cy="54" r="3" fill="#ffffff" filter="url(#tealGlow)" />
-      <circle cx="28" cy="38" r="2" fill="#2dd4bf" />
-      <circle cx="76" cy="64" r="2.2" fill="#2dd4bf" />
-      <circle cx="46" cy="34" r="2.2" fill="#99f6e4" />
-      <circle cx="62" cy="70" r="2.2" fill="#14b8a6" />
-      <circle cx="20" cy="62" r="2.5" fill="#5eead4" />
-      <circle cx="42" cy="66" r="2.2" fill="#2dd4bf" />
-    </svg>
+// Minimalist clean user avatar
+export const TeamAvatar: React.FC<{ className?: string }> = ({ className = 'w-10 h-10' }) => (
+  <div className={`${className} rounded-full overflow-hidden flex-shrink-0 bg-zinc-100 border border-zinc-200/80 flex items-center justify-center text-zinc-600 shadow-2xs`}>
+    <User className="w-5 h-5 stroke-[1.8]" />
   </div>
 );
 
@@ -102,79 +42,73 @@ export const TeamTab: React.FC<TeamTabProps> = ({
   return (
     <div className="pt-2 pb-24 space-y-5 select-none font-sans">
       {/* Top Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-black text-black tracking-tight">Team</h1>
+      <div className="pt-1 flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-zinc-950 tracking-tight">Team & Affiliates</h1>
+          <p className="text-xs text-zinc-500 font-medium">Earn two-tier referral commission</p>
+        </div>
         {onShowShareModal && (
           <button
             type="button"
             onClick={onShowShareModal}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-zinc-100 hover:bg-zinc-200 active:scale-95 text-zinc-800 text-xs font-bold transition cursor-pointer"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-100 hover:bg-zinc-200 active:scale-95 text-zinc-800 text-xs font-semibold transition cursor-pointer"
           >
             <Share2 className="w-3.5 h-3.5" />
-            <span>Invite Partner</span>
+            <span>Invite</span>
           </button>
         )}
       </div>
 
-      {/* Dark Charcoal Summary Card matching Screenshot_20261103_012840 */}
-      <div className="bg-[#3e3e3e] text-white rounded-2xl p-6 shadow-sm relative overflow-hidden">
+      {/* Commission Summary Card (Milk Colour Light UI) */}
+      <div className="bg-gradient-to-b from-[#fdfcf9] to-[#f7f4ee] text-zinc-900 rounded-2xl p-5 border border-[#eee6d8] shadow-[0_4px_20px_rgba(0,0,0,0.03)] space-y-4">
         {/* Top 2 Stats */}
         <div className="grid grid-cols-2 gap-4 items-start">
           <div>
-            <div className="text-[30px] sm:text-[32px] font-extrabold tracking-tight text-white leading-none">
-              {displayCommission === 0
-                ? '0'
-                : displayCommission.toLocaleString('en-US', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2,
-                  })}
+            <span className="text-xs text-zinc-500 font-semibold">Team Commission</span>
+            <div className="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight mt-1 tabular-nums">
+              ₹{displayCommission.toLocaleString('en-IN', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </div>
-            <div className="text-xs text-zinc-300 font-medium mt-2">Team Commission (₹)</div>
           </div>
 
           <div>
-            <div className="text-[30px] sm:text-[32px] font-extrabold tracking-tight text-white leading-none">
-              {displayRecharge === 0
-                ? '0'
-                : displayRecharge.toLocaleString('en-US', {
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 2,
-                  })}
+            <span className="text-xs text-zinc-500 font-semibold">Team Volume</span>
+            <div className="text-2xl sm:text-3xl font-black text-zinc-950 tracking-tight mt-1 tabular-nums">
+              ₹{displayRecharge.toLocaleString('en-IN', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0,
+              })}
             </div>
-            <div className="text-xs text-zinc-300 font-medium mt-2">Team Recharge (₹)</div>
           </div>
         </div>
 
         {/* Bottom 2 Stats */}
-        <div className="grid grid-cols-2 gap-4 mt-6 pt-5 border-t border-zinc-600/70">
+        <div className="grid grid-cols-2 gap-4 pt-3 border-t border-[#eee6d8]">
           <div>
-            <div className="text-xl font-bold tracking-tight text-white">
-              {totalTeamCount}
+            <span className="text-xs text-zinc-500 font-semibold">Active Partners</span>
+            <div className="text-base font-bold text-zinc-950 mt-0.5 tabular-nums">
+              {totalTeamCount} {totalTeamCount === 1 ? 'member' : 'members'}
             </div>
-            <div className="text-xs text-zinc-300 font-medium mt-1">Team members</div>
           </div>
 
           <div>
-            <div className="text-xl font-bold tracking-tight text-white">
-              10% / 5%
+            <span className="text-xs text-zinc-500 font-semibold">Commission Rates</span>
+            <div className="text-base font-bold text-emerald-600 mt-0.5">
+              10% T1 · 5% T2
             </div>
-            <div className="text-xs text-zinc-300 font-medium mt-1">Tier 1 / Tier 2 Rate</div>
           </div>
         </div>
       </div>
 
-      {/* Automatic Referral Live Status */}
-      <div className="p-3 bg-blue-50/80 rounded-2xl border border-blue-100 flex items-center justify-between text-xs">
+      {/* Live Commission Rail Status */}
+      <div className="p-3 bg-zinc-50 rounded-xl border border-zinc-200/80 flex items-center justify-between text-xs">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-2xs">
-            <Sparkles className="w-3.5 h-3.5" />
-          </div>
-          <div>
-            <span className="font-bold text-blue-950 block leading-tight">Auto-Referral Commission Rail</span>
-            <span className="text-[10px] text-blue-600/80 font-medium">Automatic 10% Tier 1 & 5% Tier 2 credit on trades</span>
-          </div>
+          <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span className="text-zinc-700 font-medium">Auto-credited directly to wallet on partner trades</span>
         </div>
-        <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-md">
+        <span className="text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
           Active
         </span>
       </div>
@@ -326,7 +260,7 @@ export const TeamTab: React.FC<TeamTabProps> = ({
             <button
               type="button"
               onClick={() => setSelectedMember(null)}
-              className="w-full py-2.5 bg-zinc-900 text-white rounded-xl text-xs font-bold hover:bg-black transition active:scale-95 cursor-pointer"
+              className="w-full py-2.5 bg-gradient-to-b from-[#fdfcf9] to-[#f4efe6] hover:bg-[#eee8dc] active:scale-[0.99] text-zinc-950 rounded-xl text-xs font-bold border border-[#e2d9ca] transition shadow-2xs cursor-pointer"
             >
               Close
             </button>
